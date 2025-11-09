@@ -9,6 +9,7 @@ import { v } from "convex/values";
 import { mutation, query, internalQuery } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { AUDIT_ACTIONS } from "./auditLogs";
+import { internal } from "./_generated/api";
 
 /**
  * Create a new organization
@@ -84,6 +85,16 @@ export const createOrganization = mutation({
       metadata: { name: args.name, slug: args.slug },
       timestamp: now,
     });
+
+    // Send organization created email
+    if (identity.email) {
+      await ctx.scheduler.runAfter(0, internal.emails.sendOrganizationCreatedEmail, {
+        to: identity.email,
+        organizationName: args.name,
+        plan: args.plan || "free",
+        dashboardLink: `${process.env.FRONTEND_URL || "http://localhost:5173"}/dashboard`,
+      });
+    }
 
     return orgId;
   },
@@ -385,6 +396,23 @@ export const inviteTeamMember = mutation({
       metadata: { invitedEmail: args.userEmail, role: args.role },
       timestamp: now,
     });
+
+    // Send invitation email
+    const org = await ctx.db.get(args.organizationId);
+    if (org && args.userEmail) {
+      const inviterUser = await ctx.db
+        .query("users")
+        .withIndex("by_token", (q) => q.eq("tokenIdentifier", userId))
+        .first();
+
+      await ctx.scheduler.runAfter(0, internal.emails.sendTeamInvitationEmail, {
+        to: args.userEmail,
+        organizationName: org.name,
+        inviterName: inviterUser?.name || "A team member",
+        role: args.role,
+        invitationLink: `${process.env.FRONTEND_URL || "http://localhost:5173"}/dashboard/team`,
+      });
+    }
 
     return membershipId;
   },

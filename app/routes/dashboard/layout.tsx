@@ -8,6 +8,8 @@ import { api } from "../../../convex/_generated/api";
 import type { Route } from "./+types/layout";
 import { createClerkClient } from "@clerk/react-router/api.server";
 import { Outlet } from "react-router";
+import { OnboardingFlow } from "~/components/dashboard/onboarding-flow";
+import { useState } from "react";
 
 export async function loader(args: Route.LoaderArgs) {
   const { userId } = await getAuth(args);
@@ -18,11 +20,12 @@ export async function loader(args: Route.LoaderArgs) {
   }
 
   // Parallel data fetching to reduce waterfall
-  const [subscriptionStatus, user] = await Promise.all([
+  const [subscriptionStatus, user, convexUser] = await Promise.all([
     fetchQuery(api.subscriptions.checkUserSubscriptionStatus, { userId }),
     createClerkClient({
       secretKey: process.env.CLERK_SECRET_KEY,
-    }).users.getUser(userId)
+    }).users.getUser(userId),
+    fetchQuery(api.users.findUserByToken, { tokenIdentifier: userId })
   ]);
 
   // Redirect to subscription-required if no active subscription
@@ -30,11 +33,26 @@ export async function loader(args: Route.LoaderArgs) {
     throw redirect("/subscription-required");
   }
 
-  return { user };
+  return {
+    user,
+    needsOnboarding: !convexUser?.organizationId
+  };
 }
 
 export default function DashboardLayout() {
-  const { user } = useLoaderData();
+  const { user, needsOnboarding } = useLoaderData<typeof loader>();
+  const [showOnboarding, setShowOnboarding] = useState(needsOnboarding);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Reload to get updated user data with organization
+    window.location.reload();
+  };
+
+  // If user needs onboarding, show the onboarding flow
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <SidebarProvider
@@ -53,3 +71,4 @@ export default function DashboardLayout() {
     </SidebarProvider>
   );
 }
+
