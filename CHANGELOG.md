@@ -21,6 +21,14 @@ This patch release fixes GitHub Actions workflow configuration and improves test
   - Allows gradual coverage improvement
   - Location: `.github/workflows/test.yml:46-53`
 
+**Server-Side Rendering (SSR) Error**
+- 🔧 Fixed "document is not defined" error in hero-enhanced component
+  - Moved document manipulation from module level to useEffect hook
+  - Created useGradientStyles() custom hook for client-side style injection
+  - Added proper cleanup to prevent memory leaks
+  - Gradient animations now injected only after component mounts
+  - Location: `app/components/homepage/hero-enhanced.tsx:20-46`
+
 #### Added
 
 **Testing Documentation**
@@ -80,6 +88,7 @@ e2e-tests:
 
 - `fix: Update GitHub Actions workflow with environment variables`
 - `docs: Add comprehensive TESTING.md documentation`
+- `fix: Resolve SSR error in hero-enhanced component`
 
 ---
 
