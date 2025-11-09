@@ -9,11 +9,11 @@ import { api } from "../../convex/_generated/api";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
-  const title = "React Starter Kit - Launch Your SAAS Quickly";
+  const title = "Taskcoda - Modern Task Management & Productivity Platform";
   const description =
-    "This powerful starter kit is designed to help you launch your SAAS application quickly and efficiently.";
-  const keywords = "React, Starter Kit, SAAS, Launch, Quickly, Efficiently";
-  const siteUrl = "https://www.reactstarter.xyz/";
+    "Streamline your workflow with Taskcoda. Powerful task management, team collaboration, and productivity tools built for modern teams.";
+  const keywords = "task management, productivity, project management, team collaboration, workflow, Taskcoda, TechSci";
+  const siteUrl = "https://taskcoda.com/";
   const imageUrl =
     "https://jdj14ctwppwprnqu.public.blob.vercel-storage.com/rsk-image-FcUcfBMBgsjNLo99j3NhKV64GT2bQl.png";
 
@@ -32,7 +32,7 @@ export function meta({}: Route.MetaArgs) {
     { property: "og:image:width", content: "1200" },
     { property: "og:image:height", content: "630" },
     { property: "og:url", content: siteUrl },
-    { property: "og:site_name", content: "React Starter Kit" },
+    { property: "og:site_name", content: "Taskcoda" },
     { property: "og:image", content: imageUrl },
 
     // Twitter Card
@@ -47,7 +47,7 @@ export function meta({}: Route.MetaArgs) {
       name: "keywords",
       content: keywords,
     },
-    { name: "author", content: "Ras Mic" },
+    { name: "author", content: "TechSci, Inc." },
     { name: "favicon", content: imageUrl },
   ];
 }

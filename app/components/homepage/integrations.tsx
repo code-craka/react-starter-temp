@@ -60,12 +60,11 @@ export default function IntegrationsSection({
               </div>
             </div>
             <div className="mx-auto mt-6 max-w-lg space-y-6 text-center sm:mt-0 sm:text-left">
-              <h2 className="text-balance text-3xl font-semibold md:text-4xl">
-                React Starter Kit
+              <h2 className="text-balance text-3xl font-semibold md:text-4xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                Taskcoda
               </h2>
-              <p className="text-muted-foreground">
-                This powerful starter kit is designed to help you launch your
-                SAAS application quickly and efficiently.
+              <p className="text-muted-foreground text-lg">
+                Modern task management and productivity platform built for teams who want to work smarter, not harder.
               </p>
 
               <div className="flex gap-3">
@@ -82,18 +81,14 @@ export default function IntegrationsSection({
                   >
                     {loaderData?.isSignedIn
                       ? loaderData?.hasActiveSubscription
-                        ? "Go to Dashboard (Demo)"
-                        : "Subscribe Now (Demo)"
-                      : "Get Started (Demo)"}
+                        ? "Go to Dashboard"
+                        : "Choose a Plan"
+                      : "Get Started Free"}
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
-                  <Link
-                    to="https://github.com/michaelshimeles/react-starter-kit"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    ⭐️ Start on GitHub
+                  <Link to="/contact">
+                    Contact Sales
                   </Link>
                 </Button>
               </div>

@@ -12,6 +12,13 @@ export default [
   route("pricing", "routes/pricing.tsx"),
   route("success", "routes/success.tsx"),
   route("subscription-required", "routes/subscription-required.tsx"),
+  // Legal Pages
+  route("privacy", "routes/privacy.tsx"),
+  route("terms", "routes/terms.tsx"),
+  route("cookies", "routes/cookies.tsx"),
+  route("aup", "routes/aup.tsx"),
+  route("contact", "routes/contact.tsx"),
+  // Dashboard
   layout("routes/dashboard/layout.tsx", [
     route("dashboard", "routes/dashboard/index.tsx"),
     route("dashboard/chat", "routes/dashboard/chat.tsx"),

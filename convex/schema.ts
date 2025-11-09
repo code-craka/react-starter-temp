@@ -141,4 +141,18 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_conversation", ["conversationId"])
     .index("by_timestamp", ["timestamp"]),
+
+  // Contact Form Submissions
+  contactSubmissions: defineTable({
+    name: v.string(),
+    email: v.string(),
+    subject: v.string(),
+    message: v.string(),
+    submittedAt: v.number(),
+    status: v.union(v.literal("pending"), v.literal("responded"), v.literal("spam")),
+    ipAddress: v.optional(v.string()),
+  })
+    .index("by_email", ["email"])
+    .index("by_status", ["status"])
+    .index("by_submitted_at", ["submittedAt"]),
 });
