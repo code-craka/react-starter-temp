@@ -1,5 +1,5 @@
 import { IconDashboard, IconSettings } from "@tabler/icons-react";
-import { MessageCircle, Users, BarChart3 } from "lucide-react";
+import { MessageCircle, Users, BarChart3, CreditCard } from "lucide-react";
 import { Link } from "react-router";
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
@@ -38,6 +38,11 @@ const data = {
     },
   ],
   navSecondary: [
+    {
+      title: "Billing",
+      url: "/dashboard/billing",
+      icon: CreditCard,
+    },
     {
       title: "Settings",
       url: "/dashboard/settings",

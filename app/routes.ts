@@ -17,6 +17,7 @@ export default [
     route("dashboard/chat", "routes/dashboard/chat.tsx"),
     route("dashboard/team", "routes/dashboard/team.tsx"),
     route("dashboard/usage", "routes/dashboard/usage.tsx"),
+    route("dashboard/billing", "routes/dashboard/billing.tsx"),
     route("dashboard/settings", "routes/dashboard/settings.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -287,12 +287,13 @@ export const handleWebhookEvent = mutation({
     switch (eventType) {
       case "subscription.created":
         // Insert new subscription
-        await ctx.db.insert("subscriptions", {
+        const subscriptionId = await ctx.db.insert("subscriptions", {
           polarId: args.body.data.id,
           polarPriceId: args.body.data.price_id,
           currency: args.body.data.currency,
           interval: args.body.data.recurring_interval,
           userId: args.body.data.metadata.userId,
+          organizationId: args.body.data.metadata.organizationId as any, // Link to organization
           status: args.body.data.status,
           currentPeriodStart: new Date(
             args.body.data.current_period_start
@@ -317,6 +318,18 @@ export const handleWebhookEvent = mutation({
           customFieldData: args.body.data.custom_field_data || {},
           customerId: args.body.data.customer_id,
         });
+
+        // Link subscription to organization if organizationId exists
+        if (args.body.data.metadata.organizationId) {
+          const orgId = args.body.data.metadata.organizationId as any;
+          const plan = args.body.data.metadata.plan || "pro";
+
+          await ctx.db.patch(orgId, {
+            subscriptionId: subscriptionId,
+            plan: plan,
+            updatedAt: Date.now(),
+          });
+        }
         break;
 
       case "subscription.updated":

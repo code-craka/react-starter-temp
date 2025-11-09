@@ -21,16 +21,14 @@ export default function IntegratedPricing() {
   const [plans, setPlans] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const getPlans = useAction(api.subscriptions.getAvailablePlans);
-  const subscriptionStatus = useQuery(
-    api.subscriptions.checkUserSubscriptionStatus,
-    {
-      userId: isSignedIn ? userId : undefined,
-    }
+  const getPlans = useAction(api.billing.getAvailablePlans);
+  const user = useQuery(api.users.findUserByToken, { tokenIdentifier: "" });
+  const orgSubscription = useQuery(
+    api.billing.getOrganizationSubscription,
+    user?.organizationId ? { organizationId: user.organizationId } : "skip"
   );
-  const userSubscription = useQuery(api.subscriptions.fetchUserSubscription);
-  const createCheckout = useAction(api.subscriptions.createCheckoutSession);
-  const createPortalUrl = useAction(api.subscriptions.createCustomerPortalUrl);
+  const createOrgCheckout = useAction(api.billing.createOrganizationCheckout);
+  const createPortalUrl = useAction(api.billing.getCustomerPortalUrl);
   const upsertUser = useMutation(api.users.upsertUser);
 
   // Sync user when signed in
@@ -54,10 +52,15 @@ export default function IntegratedPricing() {
     loadPlans();
   }, [getPlans]);
 
-  const handleSubscribe = async (priceId: string) => {
+  const handleSubscribe = async (priceId: string, plan: string) => {
     if (!isSignedIn) {
       // Redirect to sign in
       window.location.href = "/sign-in";
+      return;
+    }
+
+    if (!user?.organizationId) {
+      setError("You need to create an organization first. Please complete onboarding.");
       return;
     }
 
@@ -70,21 +73,25 @@ export default function IntegratedPricing() {
 
       // If user has active subscription, redirect to customer portal for plan changes
       if (
-        userSubscription?.status === "active" &&
-        userSubscription?.customerId
+        orgSubscription?.subscription?.status === "active" &&
+        orgSubscription?.subscription?.customerId
       ) {
         const portalResult = await createPortalUrl({
-          customerId: userSubscription.customerId,
+          organizationId: user.organizationId,
         });
         window.open(portalResult.url, "_blank");
         setLoadingPriceId(null);
         return;
       }
 
-      // Otherwise, create new checkout for first-time subscription
-      const checkoutUrl = await createCheckout({ priceId });
+      // Otherwise, create new checkout for organization
+      const result = await createOrgCheckout({
+        organizationId: user.organizationId,
+        priceId,
+        plan,
+      });
 
-      window.location.href = checkoutUrl;
+      window.location.href = result.checkoutUrl;
     } catch (error) {
       console.error("Failed to process subscription action:", error);
       const errorMessage =
@@ -117,12 +124,11 @@ export default function IntegratedPricing() {
         <p className="text-xl text-muted-foreground">
           Choose the plan that fits your needs
         </p>
-        {isSignedIn && !subscriptionStatus?.hasActiveSubscription && (
+        {isSignedIn && !orgSubscription?.hasActiveSubscription && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
-            <p className="text-blue-800 font-medium">📋 Complete your setup</p>
+            <p className="text-blue-800 font-medium">📋 Upgrade your organization</p>
             <p className="text-blue-700 text-sm mt-1">
-              You're signed in! Choose a plan below to access your dashboard and
-              start using all features.
+              Choose a plan below to unlock premium features for your organization.
             </p>
           </div>
         )}
@@ -144,8 +150,8 @@ export default function IntegratedPricing() {
             const price = plan.prices[0]; // Use first price for display
             // More robust current plan detection - prioritize amount matching due to price ID inconsistencies
             const isCurrentPlan =
-              userSubscription?.status === "active" &&
-              userSubscription?.amount === price.amount;
+              orgSubscription?.subscription?.status === "active" &&
+              orgSubscription?.subscription?.amount === price.amount;
 
             return (
               <Card
@@ -206,7 +212,7 @@ export default function IntegratedPricing() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    onClick={() => handleSubscribe(price.id)}
+                    onClick={() => handleSubscribe(price.id, plan.name.toLowerCase())}
                     disabled={loadingPriceId === price.id}
                     variant={isCurrentPlan ? "secondary" : "default"}
                   >
@@ -217,9 +223,9 @@ export default function IntegratedPricing() {
                       </>
                     ) : isCurrentPlan ? (
                       "✓ Current Plan"
-                    ) : userSubscription?.status === "active" ? (
+                    ) : orgSubscription?.subscription?.status === "active" ? (
                       (() => {
-                        const currentAmount = userSubscription.amount || 0;
+                        const currentAmount = orgSubscription.subscription.amount || 0;
                         const newAmount = price.amount;
 
                         if (newAmount > currentAmount) {
@@ -259,13 +265,13 @@ export default function IntegratedPricing() {
           </div>
         )}
 
-        {userSubscription &&
+        {orgSubscription?.subscription &&
           !plans?.items.some(
-            (plan: any) => plan.prices[0].id === userSubscription.polarPriceId
+            (plan: any) => plan.prices[0].id === orgSubscription.subscription.polarPriceId
           ) && (
             <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-md max-w-md mx-auto">
               <p className="text-amber-800 text-center text-sm">
-                You have an active subscription that's not shown above. Contact
+                Your organization has an active subscription that's not shown above. Contact
                 support for assistance.
               </p>
             </div>
