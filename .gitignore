@@ -6,3 +6,9 @@
 /build/
 
 .env.local
+
+# Testing
+/coverage/
+/test-results/
+/playwright-report/
+/.playwright/
