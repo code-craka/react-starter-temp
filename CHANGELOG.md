@@ -29,6 +29,14 @@ This patch release fixes GitHub Actions workflow configuration and improves test
   - Gradient animations now injected only after component mounts
   - Location: `app/components/homepage/hero-enhanced.tsx:20-46`
 
+**Security Vulnerabilities (Dependabot)**
+- 🔒 Fixed 5 security vulnerabilities (2 moderate, 3 low)
+  - Updated `ai` from 4.3.16 to 5.0.89 (fixes XSS in jsondiffpatch)
+  - Updated `vite` from 6.3.5 to 6.4.1 (fixes multiple file serving vulnerabilities)
+  - Reduced total vulnerabilities from 9 to 4 (55% reduction)
+  - Remaining 4 low severity issues are in indirect dependencies
+  - All critical and moderate vulnerabilities resolved ✅
+
 #### Added
 
 **Testing Documentation**
@@ -83,12 +91,29 @@ e2e-tests:
 - ✅ Coverage: 26.05% (exceeds 25% threshold)
 - ✅ CI/CD workflows now pass without environment variable errors
 - ✅ Build process works with placeholder values
+- ✅ Security: 5 vulnerabilities fixed (9 → 4 total)
+
+#### Security
+
+**Vulnerabilities Fixed**:
+- ✅ Moderate: Vercel AI SDK filetype whitelist bypass (GHSA-rwvc-j5jr-mgvh)
+- ✅ Moderate: jsondiffpatch XSS vulnerability (GHSA-33vc-wfww-vjfv)
+- ✅ Low: Vite server.fs.deny bypass on Windows
+- ✅ Low: Vite middleware file serving issue
+- ✅ Low: Vite server.fs settings not applied to HTML
+
+**Vulnerabilities Remaining** (4 low severity, indirect dependencies):
+- brace-expansion: RegEx DoS (CVSS 3.1) - 2 instances
+- on-headers: HTTP header manipulation (CVSS 3.1)
+
+**Impact**: All moderate/high/critical vulnerabilities resolved. Remaining low severity issues require major version upgrades that would cause breaking changes.
 
 #### Commits
 
 - `fix: Update GitHub Actions workflow with environment variables`
 - `docs: Add comprehensive TESTING.md documentation`
 - `fix: Resolve SSR error in hero-enhanced component`
+- `security: Fix Dependabot vulnerabilities (5 fixed, 4 low remaining)`
 
 ---
 
