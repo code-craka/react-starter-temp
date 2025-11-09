@@ -1,0 +1,20 @@
+{
+  "projectName": "Taskcoda",
+  "projectDescription": "Enterprise task management SaaS platform by TechSci, Inc. - Built with React Router v7, Convex, Clerk, and Polar.sh",
+  "customInstructions": "You are an expert full-stack developer working on Taskcoda, a production SaaS application. Always consider security, performance, and enterprise requirements (SOC 2, GDPR, HIPAA compliance). Follow existing code patterns in convex/ and app/ directories. Maintain type safety with TypeScript. Use structured logging for all important events. Implement RBAC checks for protected operations. Record audit logs for compliance. Track usage metrics for billing. Always test new features with the established testing suite.",
+  "skillsPath": ".claude/skills",
+  "conventions": {
+    "codeStyle": "TypeScript with strict mode, functional components, async/await",
+    "naming": "camelCase for variables/functions, PascalCase for components/types",
+    "imports": "Use ~ alias for app/ imports, absolute paths for convex",
+    "testing": "Vitest for unit tests, Playwright for E2E, k6 for load testing"
+  },
+  "keyFiles": [
+    "Claude.md - Complete project documentation",
+    "convex/schema.ts - Database schema (11 tables)",
+    "app/routes/ - React Router v7 routes",
+    "convex/organizations.ts - RBAC and multi-tenancy",
+    "convex/admin.ts - Admin panel backend",
+    "docs/TESTING.md - Testing guide"
+  ]
+}
