@@ -24,16 +24,27 @@ export default defineSchema({
     name: v.string(),
     slug: v.string(),
     ownerId: v.string(), // User tokenIdentifier
-    plan: v.optional(v.string()), // "free", "pro", "enterprise"
+    plan: v.optional(v.union(
+      v.literal("free"),
+      v.literal("pro"),
+      v.literal("enterprise")
+    )),
     subscriptionId: v.optional(v.id("subscriptions")),
-    settings: v.optional(v.any()),
-    metadata: v.optional(v.any()),
+    // Settings with known structure for type safety
+    settings: v.optional(v.object({
+      theme: v.optional(v.union(v.literal("light"), v.literal("dark"), v.literal("auto"))),
+      emailNotifications: v.optional(v.boolean()),
+      weeklyReports: v.optional(v.boolean()),
+    })),
+    // Flexible metadata for additional custom data
+    metadata: v.optional(v.object({})),
     createdAt: v.number(),
     updatedAt: v.number(),
     deletedAt: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])
-    .index("by_owner", ["ownerId"]),
+    .index("by_owner", ["ownerId"])
+    .index("by_plan", ["plan"]),
 
   teamMembers: defineTable({
     organizationId: v.id("organizations"),
@@ -59,36 +70,86 @@ export default defineSchema({
     .index("by_organization_and_user", ["organizationId", "userId"]),
 
   subscriptions: defineTable({
+    // User/Organization links
     userId: v.optional(v.string()),
     organizationId: v.optional(v.id("organizations")),
-    polarId: v.optional(v.string()),
+
+    // Polar IDs (required for syncing with Polar.sh)
+    polarId: v.string(),
+    customerId: v.string(),
+    productId: v.string(),
+
+    // Pricing details
     polarPriceId: v.optional(v.string()),
-    currency: v.optional(v.string()),
-    interval: v.optional(v.string()),
-    status: v.optional(v.string()),
-    currentPeriodStart: v.optional(v.number()),
+    currency: v.string(),
+    interval: v.optional(v.union(
+      v.literal("month"),
+      v.literal("year")
+    )),
+    amount: v.number(),
+
+    // Subscription status (Polar.sh enum values)
+    status: v.union(
+      v.literal("incomplete"),
+      v.literal("incomplete_expired"),
+      v.literal("trialing"),
+      v.literal("active"),
+      v.literal("past_due"),
+      v.literal("canceled"),
+      v.literal("unpaid"),
+      v.literal("revoked")
+    ),
+
+    // Timestamps (stored as Unix ms)
+    createdAt: v.number(),
+    modifiedAt: v.optional(v.number()),
+    currentPeriodStart: v.number(),
     currentPeriodEnd: v.optional(v.number()),
-    cancelAtPeriodEnd: v.optional(v.boolean()),
-    amount: v.optional(v.number()),
     startedAt: v.optional(v.number()),
     endsAt: v.optional(v.number()),
     endedAt: v.optional(v.number()),
     canceledAt: v.optional(v.number()),
-    customerCancellationReason: v.optional(v.string()),
+
+    // Cancellation details
+    cancelAtPeriodEnd: v.boolean(),
+    customerCancellationReason: v.optional(v.union(
+      v.literal("customer_service"),
+      v.literal("too_expensive"),
+      v.literal("missing_features"),
+      v.literal("switched_service"),
+      v.literal("unused"),
+      v.literal("other")
+    )),
     customerCancellationComment: v.optional(v.string()),
-    metadata: v.optional(v.any()),
+
+    // Additional Polar.sh fields
+    discountId: v.optional(v.string()),
+    checkoutId: v.optional(v.string()),
+
+    // Metadata - structured for known fields
+    metadata: v.optional(v.object({
+      userId: v.optional(v.string()),
+      organizationId: v.optional(v.string()),
+      plan: v.optional(v.string()),
+    })),
+    // Custom fields - keep flexible as Polar allows arbitrary custom fields
     customFieldData: v.optional(v.any()),
-    customerId: v.optional(v.string()),
   })
     .index("userId", ["userId"])
     .index("polarId", ["polarId"])
-    .index("organizationId", ["organizationId"]),
+    .index("organizationId", ["organizationId"])
+    .index("customerId", ["customerId"])
+    .index("productId", ["productId"])
+    .index("status", ["status"]),
 
   webhookEvents: defineTable({
     type: v.string(),
     polarEventId: v.string(),
     createdAt: v.string(),
     modifiedAt: v.string(),
+    // Flexible data storage for different webhook event types
+    // Each event type has a different payload structure
+    // Type-safe access should be done in query/mutation handlers
     data: v.any(),
   })
     .index("type", ["type"])

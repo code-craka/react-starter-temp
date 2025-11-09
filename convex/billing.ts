@@ -166,7 +166,7 @@ export const linkSubscriptionToOrganization = internalMutation({
   args: {
     subscriptionId: v.id("subscriptions"),
     organizationId: v.id("organizations"),
-    plan: v.string(),
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
   },
   handler: async (ctx, args) => {
     // Update subscription with organization ID
@@ -321,7 +321,7 @@ export const getAvailablePlans = action({
 export const updateOrganizationPlan = internalMutation({
   args: {
     organizationId: v.id("organizations"),
-    plan: v.string(),
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
     subscriptionStatus: v.string(),
   },
   handler: async (ctx, args) => {
