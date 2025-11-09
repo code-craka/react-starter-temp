@@ -4,6 +4,19 @@ import { Webhook, WebhookVerificationError } from "standardwebhooks";
 import { api } from "./_generated/api";
 import { action, httpAction, mutation, query } from "./_generated/server";
 
+// Type guard to check if a price has amount and currency fields (fixed price)
+function hasPriceAmount(
+  price: unknown
+): price is { id: string; priceAmount: number; priceCurrency: string; recurringInterval?: string | null } {
+  return (
+    typeof price === 'object' &&
+    price !== null &&
+    'priceAmount' in price &&
+    'priceCurrency' in price &&
+    'id' in price
+  );
+}
+
 const createCheckout = async ({
   customerEmail,
   productPriceId,
@@ -33,7 +46,7 @@ const createCheckout = async ({
   let productId = null;
   for (const product of productsResult.items) {
     const hasPrice = product.prices.some(
-      (price: any) => price.id === productPriceId
+      (price) => price.id === productPriceId
     );
     if (hasPrice) {
       productId = product.id;
@@ -77,18 +90,26 @@ export const getAvailablePlansQuery = query({
     });
 
     // Transform the data to remove Date objects and keep only needed fields
-    const cleanedItems = result.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      isRecurring: item.isRecurring,
-      prices: item.prices.map((price: any) => ({
-        id: price.id,
-        amount: price.priceAmount,
-        currency: price.priceCurrency,
-        interval: price.recurringInterval,
-      })),
-    }));
+    const cleanedItems = result.items.map((item) => {
+      const fixedPrices = item.prices.filter(hasPriceAmount) as Array<{
+        id: string;
+        priceAmount: number;
+        priceCurrency: string;
+        recurringInterval?: string | null;
+      }>;
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        isRecurring: item.isRecurring,
+        prices: fixedPrices.map((price) => ({
+          id: price.id,
+          amount: price.priceAmount,
+          currency: price.priceCurrency,
+          interval: price.recurringInterval ?? null,
+        })),
+      };
+    });
 
     return {
       items: cleanedItems,
@@ -110,18 +131,26 @@ export const getAvailablePlans = action({
     });
 
     // Transform the data to remove Date objects and keep only needed fields
-    const cleanedItems = result.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      isRecurring: item.isRecurring,
-      prices: item.prices.map((price: any) => ({
-        id: price.id,
-        amount: price.priceAmount,
-        currency: price.priceCurrency,
-        interval: price.recurringInterval,
-      })),
-    }));
+    const cleanedItems = result.items.map((item) => {
+      const fixedPrices = item.prices.filter(hasPriceAmount) as Array<{
+        id: string;
+        priceAmount: number;
+        priceCurrency: string;
+        recurringInterval?: string | null;
+      }>;
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        isRecurring: item.isRecurring,
+        prices: fixedPrices.map((price) => ({
+          id: price.id,
+          amount: price.priceAmount,
+          currency: price.priceCurrency,
+          interval: price.recurringInterval ?? null,
+        })),
+      };
+    });
 
     return {
       items: cleanedItems,

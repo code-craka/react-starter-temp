@@ -8,7 +8,20 @@ import { v } from "convex/values";
 import { action, mutation, query, internalMutation } from "./_generated/server";
 import { Polar } from "@polar-sh/sdk";
 import { api, internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
+
+// Type guard to check if a price has amount and currency fields (fixed price)
+function hasPriceAmount(
+  price: unknown
+): price is { id: string; priceAmount: number; priceCurrency: string; recurringInterval?: string | null } {
+  return (
+    typeof price === 'object' &&
+    price !== null &&
+    'priceAmount' in price &&
+    'priceCurrency' in price &&
+    'id' in price
+  );
+}
 
 /**
  * Get organization's subscription details
@@ -93,7 +106,7 @@ export const createOrganizationCheckout = action({
 
     let productId = null;
     for (const product of productsResult.items) {
-      const hasPrice = product.prices.some((price: any) => price.id === args.priceId);
+      const hasPrice = product.prices.some((price) => price.id === args.priceId);
       if (hasPrice) {
         productId = product.id;
         break;
@@ -277,18 +290,26 @@ export const getAvailablePlans = action({
     });
 
     // Transform the data to remove Date objects and keep only needed fields
-    const plans = result.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      isRecurring: item.isRecurring,
-      prices: item.prices.map((price: any) => ({
-        id: price.id,
-        amount: price.priceAmount,
-        currency: price.priceCurrency,
-        interval: price.recurringInterval,
-      })),
-    }));
+    const plans = result.items.map((item) => {
+      const fixedPrices = item.prices.filter(hasPriceAmount) as Array<{
+        id: string;
+        priceAmount: number;
+        priceCurrency: string;
+        recurringInterval?: string | null;
+      }>;
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        isRecurring: item.isRecurring,
+        prices: fixedPrices.map((price) => ({
+          id: price.id,
+          amount: price.priceAmount,
+          currency: price.priceCurrency,
+          interval: price.recurringInterval ?? null,
+        })),
+      };
+    });
 
     return { plans };
   },

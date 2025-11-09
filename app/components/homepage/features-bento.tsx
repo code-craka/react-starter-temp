@@ -15,11 +15,12 @@ import {
   Calendar,
   Target,
   TrendingUp,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
-
+import type { Feature, FeatureCardProps, LargeFeatureCardProps } from "~/types/features";
 const features = {
   collaboration: [
     {
@@ -218,11 +219,7 @@ const FeatureCard = memo(({
   feature,
   delay,
   controls,
-}: {
-  feature: any;
-  delay: number;
-  controls: any;
-}) => {
+}: FeatureCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -295,7 +292,7 @@ const LargeFeatureCard = memo(({
   description,
   gradient,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   description: string;
   gradient: string;

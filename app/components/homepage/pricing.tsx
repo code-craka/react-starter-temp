@@ -13,7 +13,8 @@ import {
 } from "~/components/ui/card";
 import { api } from "../../../convex/_generated/api";
 
-export default function Pricing({ loaderData }: { loaderData: any }) {
+import type { PricingLoaderData } from "~/types/pricing";
+export default function Pricing({ loaderData }: { loaderData: PricingLoaderData }) {
   const { isSignedIn } = useAuth();
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

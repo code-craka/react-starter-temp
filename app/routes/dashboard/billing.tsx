@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useAction } from "convex/react";
+import type { OrganizationId } from "~/types/organization";
 import { api } from "convex/_generated/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -40,7 +41,7 @@ export default function BillingPage() {
   return <BillingManagement organizationId={user.organizationId} />;
 }
 
-function BillingManagement({ organizationId }: { organizationId: any }) {
+function BillingManagement({ organizationId }: { organizationId: OrganizationId }) {
   const subscriptionData = useQuery(api.billing.getOrganizationSubscription, {
     organizationId,
   });

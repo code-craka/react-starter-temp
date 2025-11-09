@@ -32,7 +32,7 @@ export function OrganizationSwitcher({ className }: OrganizationSwitcherProps) {
   const organizations = useQuery(api.organizations.getUserOrganizations);
 
   // Find current organization
-  const currentOrg = organizations?.find((org) => org._id === user?.organizationId);
+  const currentOrg = organizations?.find((org: { _id: Id<"organizations"> }) => org._id === user?.organizationId);
 
   if (!organizations || organizations.length === 0) {
     return (
@@ -76,7 +76,7 @@ export function OrganizationSwitcher({ className }: OrganizationSwitcherProps) {
         <DropdownMenuContent align="start" className="w-[240px]">
           <DropdownMenuLabel>Organizations</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {organizations.map((org) => (
+          {organizations.map((org: { _id: Id<"organizations">; name?: string; role?: string; plan?: string }) => (
             <DropdownMenuItem
               key={org._id}
               onSelect={() => {

@@ -7,7 +7,7 @@
 
 import { v } from "convex/values";
 import { mutation, query, internalQuery } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 import { AUDIT_ACTIONS } from "./auditLogs";
 import { internal } from "./_generated/api";
 

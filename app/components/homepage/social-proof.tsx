@@ -5,6 +5,7 @@ import { useInView } from "react-intersection-observer";
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import type { StatCardProps, TestimonialCarouselProps, TestimonialCardProps, CompanyLogoProps } from "~/types/social-proof";
 import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
@@ -153,7 +154,7 @@ export default function SocialProof() {
 }
 
 // Animated stat card with counter
-const StatCard = memo(({ stat, inView, delay }: any) => {
+const StatCard = memo(({ stat, inView, delay }: StatCardProps) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const isInView = useFramerInView(ref, { once: true });
@@ -208,7 +209,7 @@ const StatCard = memo(({ stat, inView, delay }: any) => {
 });
 
 // Testimonial carousel
-const TestimonialCarousel = memo(({ testimonials }: { testimonials: any[] }) => {
+const TestimonialCarousel = memo(({ testimonials }: TestimonialCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "center" },
     [Autoplay({ delay: 5000, stopOnInteraction: true })]
@@ -284,7 +285,7 @@ const TestimonialCarousel = memo(({ testimonials }: { testimonials: any[] }) => 
 });
 
 // Individual testimonial card
-const TestimonialCard = memo(({ testimonial }: { testimonial: any }) => {
+const TestimonialCard = memo(({ testimonial }: TestimonialCardProps) => {
   return (
     <motion.div
       className="bg-background border rounded-2xl p-6 h-full hover:border-primary/50 transition-all duration-300 hover:shadow-lg"
@@ -323,7 +324,7 @@ const TestimonialCard = memo(({ testimonial }: { testimonial: any }) => {
 });
 
 // Company logo with grayscale hover effect
-const CompanyLogo = memo(({ company, delay }: { company: any; delay: number }) => {
+const CompanyLogo = memo(({ company, delay }: CompanyLogoProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (

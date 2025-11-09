@@ -1,4 +1,5 @@
 import { useQuery } from "convex/react";
+import type { OrganizationId } from "~/types/organization";
 import { api } from "convex/_generated/api";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -16,7 +17,7 @@ export function SubscriptionStatusCard() {
   return <SubscriptionStatus organizationId={user.organizationId} />;
 }
 
-function SubscriptionStatus({ organizationId }: { organizationId: any }) {
+function SubscriptionStatus({ organizationId }: { organizationId: OrganizationId }) {
   const subscriptionData = useQuery(api.billing.getOrganizationSubscription, {
     organizationId,
   });

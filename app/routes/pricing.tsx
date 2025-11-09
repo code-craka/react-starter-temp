@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import type { Plan } from "~/types/pricing-cards";
 import { api } from "../../convex/_generated/api";
 
 export default function IntegratedPricing() {
@@ -136,13 +137,13 @@ export default function IntegratedPricing() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full">
         {plans.items
-          .sort((a: any, b: any) => {
+          .sort((a: Plan, b: Plan) => {
             const priceComparison = a.prices[0].amount - b.prices[0].amount;
             return priceComparison !== 0
               ? priceComparison
               : a.name.localeCompare(b.name);
           })
-          .map((plan: any, index: number) => {
+          .map((plan: Plan, index: number) => {
             const isPopular =
               plans.items.length === 2
                 ? index === 1
@@ -267,7 +268,7 @@ export default function IntegratedPricing() {
 
         {orgSubscription?.subscription &&
           !plans?.items.some(
-            (plan: any) => plan.prices[0].id === orgSubscription.subscription.polarPriceId
+            (plan: Plan) => plan.prices[0].id === orgSubscription.subscription.polarPriceId
           ) && (
             <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-md max-w-md mx-auto">
               <p className="text-amber-800 text-center text-sm">

@@ -1,4 +1,5 @@
 import { IconDashboard, IconSettings } from "@tabler/icons-react";
+import type { ClerkUser } from "~/types/clerk";
 import { MessageCircle, Users, BarChart3, CreditCard } from "lucide-react";
 import { Link } from "react-router";
 import { NavMain } from "./nav-main";
@@ -56,7 +57,7 @@ export function AppSidebar({
   user,
 }: {
   variant: "sidebar" | "floating" | "inset";
-  user: any;
+  user: ClerkUser;
 }) {
   return (
     <Sidebar collapsible="offcanvas" variant={variant}>

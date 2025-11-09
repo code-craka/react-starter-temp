@@ -6,7 +6,7 @@
 
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
 /**
  * Save a chat message (internal use from HTTP endpoints)

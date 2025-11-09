@@ -15,8 +15,10 @@ import {
 } from "~/components/ui/card";
 import { api } from "../../../convex/_generated/api";
 import { cn } from "~/lib/utils";
+import type { PricingLoaderData } from "~/types/pricing";
+import type { Plan, PlanPrice, PricingCard3DProps, ComparisonTableProps } from "~/types/pricing-cards";
 
-export default function PricingEnhanced({ loaderData }: { loaderData: any }) {
+export default function PricingEnhanced({ loaderData }: { loaderData: PricingLoaderData }) {
   const { isSignedIn } = useAuth();
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -110,13 +112,13 @@ export default function PricingEnhanced({ loaderData }: { loaderData: any }) {
         ) : (
           <div className="mt-8 grid gap-8 md:grid-cols-3">
             {loaderData.plans.items
-              .sort((a: any, b: any) => {
+              .sort((a: Plan, b: Plan) => {
                 const priceComparison = a.prices[0].amount - b.prices[0].amount;
                 return priceComparison !== 0
                   ? priceComparison
                   : a.name.localeCompare(b.name);
               })
-              .map((plan: any, index: number) => {
+              .map((plan: Plan, index: number) => {
                 const isPopular =
                   loaderData.plans.items.length === 2
                     ? index === 1
@@ -172,7 +174,7 @@ const PricingCard3D = memo(({
   onSubscribe,
   controls,
   delay,
-}: any) => {
+}: PricingCard3DProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -392,7 +394,7 @@ const PricingCard3D = memo(({
 });
 
 // Plan comparison table
-const ComparisonTable = memo(({ controls }: any) => {
+const ComparisonTable = memo(({ controls }: ComparisonTableProps) => {
   return (
     <motion.div
       className="mt-20 md:mt-32"
