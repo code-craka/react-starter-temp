@@ -57,6 +57,13 @@
      - `app/routes/admin/users.tsx:196,340,360`
      - `app/routes/dashboard/team.tsx:253`
 
+7. **✅ Implemented CodeQL Advanced Security Scanning**
+   - Added GitHub Actions workflow for automated security vulnerability detection
+   - JavaScript/TypeScript code analysis with CodeQL v4
+   - Configured triggers: Push to main, PRs, weekly scheduled scans (Saturdays)
+   - Security alerts integrated with GitHub Security tab
+   - Location: `.github/workflows/codeql.yml`
+
 #### 📊 TypeScript Error Reduction
 
 | Status | Count | Category |
@@ -75,7 +82,7 @@
 - ✅ Implicit any errors: **0** (fixed in v2.1.1)
 - ⚠️ Convex type generation: **63** (requires `npx convex dev`)
 
-**Files Modified in v2.1.1 (12 files):**
+**Files Modified in v2.1.1 (15 files):**
 1. `convex/health.ts` - Type-only imports
 2. `convex/organizations.ts` - Plan type assertion
 3. `convex/admin.ts` - Auth pattern + plan type
@@ -87,7 +94,10 @@
 9. `app/routes/admin/organizations.tsx` - Explicit any (4x)
 10. `app/routes/admin/users.tsx` - Explicit any (3x)
 11. `app/routes/dashboard/team.tsx` - Explicit any
-12. `CHANGELOG.md`, `README.md`, `Claude.md` - Documentation updates
+12. `.github/workflows/codeql.yml` - Security scanning workflow
+13. `CHANGELOG.md` - Added CodeQL feature to v2.1.1
+14. `README.md` - Added Security & Code Quality section
+15. `Claude.md` - Updated session summary
 
 **Next Steps:**
 - Run `npx convex dev` locally to regenerate API types

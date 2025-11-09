@@ -141,6 +141,14 @@
 - 📝 **Logging** - Comprehensive logging with Pino
 - 🏥 **Health Checks** - System health monitoring endpoints
 
+### 🔒 Security & Code Quality
+
+- 🛡️ **CodeQL Advanced** - Automated security vulnerability scanning
+- 🔍 **Weekly Security Scans** - Scheduled CodeQL analysis
+- 🚨 **Security Alerts** - GitHub Security tab integration
+- ✅ **PR Security Checks** - Automatic scan on pull requests
+- 🔐 **Code Analysis** - JavaScript/TypeScript security analysis
+
 ### 👥 Admin Panel
 
 - User management with activity tracking
@@ -592,6 +600,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 - 🎯 Fixed all implicit any type errors
 - 🔨 Resolved type import and union type mismatches
 - 📊 Reduced TypeScript errors from 80 to 63 (remaining are Convex type generation)
+- 🔒 Added CodeQL Advanced security scanning workflow
 
 ### Previous Version: v2.1.0
 - 🐛 Critical bug fixes for production stability

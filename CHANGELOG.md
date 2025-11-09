@@ -56,6 +56,16 @@ This patch release focuses on resolving all non-Convex TypeScript errors, improv
   - `app/routes/admin/users.tsx:196,340,360` - Users, metrics, and logs
   - `app/routes/dashboard/team.tsx:253` - Team members display
 
+#### Added
+
+**Security & CI/CD**
+- 🔒 Implemented CodeQL Advanced security scanning workflow
+  - Automated security vulnerability detection
+  - JavaScript/TypeScript code analysis with CodeQL v4
+  - Triggers: Push to main, Pull requests, Weekly scheduled scans
+  - Security alerts in GitHub Security tab
+  - Location: `.github/workflows/codeql.yml`
+
 #### Changed
 
 **TypeScript Error Reduction**
@@ -122,6 +132,7 @@ Math.max(...Object.values(data).map(v => v as number))
 #### Commits
 
 - `fix: Resolve all non-Convex TypeScript errors (19 fixes)`
+- `feat: Add CodeQL Advanced security scanning workflow`
 
 ---
 
