@@ -1,10 +1,11 @@
 import { getAuth } from "@clerk/react-router/ssr.server";
 import { fetchAction, fetchQuery } from "convex/nextjs";
-import ContentSection from "~/components/homepage/content";
+import HeroEnhanced from "~/components/homepage/hero-enhanced";
+import FeaturesBento from "~/components/homepage/features-bento";
+import SocialProof from "~/components/homepage/social-proof";
+import PricingEnhanced from "~/components/homepage/pricing-enhanced";
+import FAQ from "~/components/homepage/faq";
 import Footer from "~/components/homepage/footer";
-import Integrations from "~/components/homepage/integrations";
-import Pricing from "~/components/homepage/pricing";
-import Team from "~/components/homepage/team";
 import { api } from "../../convex/_generated/api";
 import type { Route } from "./+types/home";
 
@@ -78,10 +79,11 @@ export async function loader(args: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <>
-      <Integrations loaderData={loaderData} />
-      <ContentSection />
-      <Team />
-      <Pricing loaderData={loaderData} />
+      <HeroEnhanced loaderData={loaderData} />
+      <FeaturesBento />
+      <SocialProof />
+      <PricingEnhanced loaderData={loaderData} />
+      <FAQ />
       <Footer />
     </>
   );
