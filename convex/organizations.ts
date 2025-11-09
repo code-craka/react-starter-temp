@@ -651,3 +651,38 @@ export const checkPermission = query({
     return { hasPermission, role: membership.role };
   },
 });
+
+/**
+ * Get current user's team member role in organization
+ */
+export const getTeamMemberRole = query({
+  args: {
+    organizationId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+
+    const userId = identity.tokenIdentifier;
+
+    const membership = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_organization_and_user", (q) =>
+        q.eq("organizationId", args.organizationId).eq("userId", userId)
+      )
+      .first();
+
+    if (!membership || membership.status !== "active") {
+      return null;
+    }
+
+    return {
+      role: membership.role,
+      userId: membership.userId,
+      status: membership.status,
+      membershipId: membership._id,
+    };
+  },
+});
