@@ -15,8 +15,15 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
+import { useEffect } from "react";
+import { initSentry, captureSentryError } from "./lib/sentry.client";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+// Initialize Sentry on client side
+if (typeof window !== "undefined") {
+  initSentry();
+}
 
 export async function loader(args: Route.LoaderArgs) {
   return rootAuthLoader(args);
@@ -102,6 +109,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
+
+  // Capture error to Sentry
+  useEffect(() => {
+    if (error && error instanceof Error && !isRouteErrorResponse(error)) {
+      captureSentryError(error, {
+        errorBoundary: "root",
+      });
+    }
+  }, [error]);
 
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "404" : "Error";

@@ -31,6 +31,7 @@
       "routes/admin/users": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/organizations": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/health": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/monitoring": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/features": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/analytics": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
@@ -242,6 +243,15 @@
           "runtime": "nodejs"
         }
       },
+      "routes/admin/monitoring": {
+        "id": "routes/admin/monitoring",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/monitoring.tsx",
+        "path": "admin/monitoring",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
       "routes/admin/features": {
         "id": "routes/admin/features",
         "parentId": "routes/admin/layout",
@@ -414,6 +424,12 @@
         "parentId": "routes/admin/layout",
         "file": "routes/admin/health.tsx",
         "path": "admin/health"
+      },
+      "routes/admin/monitoring": {
+        "id": "routes/admin/monitoring",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/monitoring.tsx",
+        "path": "admin/monitoring"
       },
       "routes/admin/features": {
         "id": "routes/admin/features",

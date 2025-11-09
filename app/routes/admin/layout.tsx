@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/react-router/ssr.server";
 import { fetchQuery } from "convex/nextjs";
 import {
+  Activity,
   BarChart3,
   Flag,
   Heart,
@@ -66,6 +67,12 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
       href: "/admin/health",
       icon: Heart,
       current: location.pathname === "/admin/health",
+    },
+    {
+      name: "Monitoring",
+      href: "/admin/monitoring",
+      icon: Activity,
+      current: location.pathname === "/admin/monitoring",
     },
     {
       name: "Feature Flags",

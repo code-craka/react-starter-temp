@@ -33,6 +33,7 @@ export default [
     route("admin/users", "routes/admin/users.tsx"),
     route("admin/organizations", "routes/admin/organizations.tsx"),
     route("admin/health", "routes/admin/health.tsx"),
+    route("admin/monitoring", "routes/admin/monitoring.tsx"),
     route("admin/features", "routes/admin/features.tsx"),
     route("admin/analytics", "routes/admin/analytics.tsx"),
   ]),
