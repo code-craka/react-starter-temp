@@ -12,6 +12,7 @@ Tests require these environment variables (automatically configured):
 VITE_CONVEX_URL=https://test.convex.cloud
 CONVEX_URL=https://test.convex.cloud
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_mock_key
+CLERK_SECRET_KEY=your_clerk_secret_key
 NODE_ENV=test
 ```
 
@@ -23,7 +24,8 @@ Variables are automatically set in `.github/workflows/test.yml`
 
 For production builds, add GitHub Secrets:
 - `VITE_CONVEX_URL` - Your Convex deployment URL
-- `VITE_CLERK_PUBLISHABLE_KEY` - Your Clerk key
+- `VITE_CLERK_PUBLISHABLE_KEY` - Your Clerk publishable key
+- `CLERK_SECRET_KEY` - Your Clerk secret key (required for SSR)
 
 ## Running Tests
 

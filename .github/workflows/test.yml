@@ -31,6 +31,7 @@ jobs:
           VITE_CONVEX_URL: https://test.convex.cloud
           CONVEX_URL: https://test.convex.cloud
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_mock_key
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NODE_ENV: test
 
       - name: Upload coverage to Codecov
@@ -80,6 +81,7 @@ jobs:
           CI: true
           VITE_CONVEX_URL: https://test.convex.cloud
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_mock
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NODE_ENV: test
 
       - name: Upload Playwright report
@@ -121,6 +123,7 @@ jobs:
         env:
           VITE_CONVEX_URL: https://placeholder.convex.cloud
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NODE_ENV: production
 
       - name: Check bundle size

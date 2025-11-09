@@ -9,10 +9,16 @@ This patch release fixes GitHub Actions workflow configuration and improves test
 **GitHub Actions Environment Variables**
 - 🔧 Fixed missing CONVEX_URL environment variable in test workflow
   - Added `VITE_CONVEX_URL` and `CONVEX_URL` to unit test job
-  - Added environment variables to E2E test job  
+  - Added environment variables to E2E test job
   - Added placeholder variables to build job
   - Prevents "No address provided to ConvexReactClient" error
   - Location: `.github/workflows/test.yml`
+- 🔧 Fixed missing CLERK_SECRET_KEY environment variable in test workflow
+  - Added `CLERK_SECRET_KEY` to all test jobs (unit, e2e, build)
+  - Prevents "Clerk: A secretKey must be provided in order to use SSR" error
+  - Required by `rootAuthLoader` and `createClerkClient` for SSR authentication
+  - Uses GitHub Secrets for secure key management
+  - Location: `.github/workflows/test.yml:34,84,126`
 
 **Coverage Threshold Configuration**
 - 🔧 Updated coverage threshold from 60% to 25% to match actual achievement
