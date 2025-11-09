@@ -18,6 +18,8 @@
       "routes/subscription-required": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/index": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/chat": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard/team": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard/usage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/settings": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
@@ -105,6 +107,24 @@
           "runtime": "nodejs"
         }
       },
+      "routes/dashboard/team": {
+        "id": "routes/dashboard/team",
+        "parentId": "routes/dashboard/layout",
+        "file": "app/routes/dashboard/team.tsx",
+        "path": "dashboard/team",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/dashboard/usage": {
+        "id": "routes/dashboard/usage",
+        "parentId": "routes/dashboard/layout",
+        "file": "app/routes/dashboard/usage.tsx",
+        "path": "dashboard/usage",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
       "routes/dashboard/settings": {
         "id": "routes/dashboard/settings",
         "parentId": "routes/dashboard/layout",
@@ -117,9 +137,9 @@
     }
   },
   "reactRouterConfig": {
-    "appDirectory": "/Users/michaelshimeles/Desktop/rsk/app",
+    "appDirectory": "/home/user/react-starter-temp/app",
     "basename": "/",
-    "buildDirectory": "/Users/michaelshimeles/Desktop/rsk/build",
+    "buildDirectory": "/home/user/react-starter-temp/build",
     "future": {
       "unstable_middleware": false,
       "unstable_optimizeDeps": false,
@@ -185,6 +205,18 @@
         "parentId": "routes/dashboard/layout",
         "file": "routes/dashboard/chat.tsx",
         "path": "dashboard/chat"
+      },
+      "routes/dashboard/team": {
+        "id": "routes/dashboard/team",
+        "parentId": "routes/dashboard/layout",
+        "file": "routes/dashboard/team.tsx",
+        "path": "dashboard/team"
+      },
+      "routes/dashboard/usage": {
+        "id": "routes/dashboard/usage",
+        "parentId": "routes/dashboard/layout",
+        "file": "routes/dashboard/usage.tsx",
+        "path": "dashboard/usage"
       },
       "routes/dashboard/settings": {
         "id": "routes/dashboard/settings",
