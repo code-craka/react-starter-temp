@@ -27,4 +27,13 @@ export default [
     route("dashboard/billing", "routes/dashboard/billing.tsx"),
     route("dashboard/settings", "routes/dashboard/settings.tsx"),
   ]),
+  // Admin Panel
+  layout("routes/admin/layout.tsx", [
+    route("admin", "routes/admin/index.tsx"),
+    route("admin/users", "routes/admin/users.tsx"),
+    route("admin/organizations", "routes/admin/organizations.tsx"),
+    route("admin/health", "routes/admin/health.tsx"),
+    route("admin/features", "routes/admin/features.tsx"),
+    route("admin/analytics", "routes/admin/analytics.tsx"),
+  ]),
 ] satisfies RouteConfig;

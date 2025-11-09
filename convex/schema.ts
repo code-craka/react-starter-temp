@@ -7,15 +7,18 @@ export default defineSchema({
     email: v.optional(v.string()),
     image: v.optional(v.string()),
     tokenIdentifier: v.string(),
-    role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
+    role: v.optional(v.union(v.literal("super_admin"), v.literal("admin"), v.literal("user"))),
     organizationId: v.optional(v.id("organizations")),
+    isSuspended: v.optional(v.boolean()),
+    lastLoginAt: v.optional(v.number()),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     deletedAt: v.optional(v.number()), // Soft delete for compliance
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_organization", ["organizationId"])
-    .index("by_email", ["email"]),
+    .index("by_email", ["email"])
+    .index("by_role", ["role"]),
 
   organizations: defineTable({
     name: v.string(),
@@ -155,4 +158,31 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_status", ["status"])
     .index("by_submitted_at", ["submittedAt"]),
+
+  // Feature Flags - Enable/disable features per organization
+  featureFlags: defineTable({
+    name: v.string(), // e.g., "advanced_analytics", "api_access"
+    description: v.string(),
+    enabled: v.boolean(), // Global toggle
+    organizationId: v.optional(v.id("organizations")), // Null = global, otherwise org-specific
+    rolloutPercentage: v.optional(v.number()), // For gradual rollout 0-100
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_name", ["name"])
+    .index("by_organization", ["organizationId"])
+    .index("by_enabled", ["enabled"]),
+
+  // System Metrics - Aggregated analytics data
+  systemMetrics: defineTable({
+    metricType: v.string(), // "dau", "mau", "revenue", "api_calls"
+    value: v.number(),
+    date: v.string(), // YYYY-MM-DD
+    metadata: v.optional(v.any()), // Additional breakdown data
+    timestamp: v.number(),
+  })
+    .index("by_type", ["metricType"])
+    .index("by_date", ["date"])
+    .index("by_type_and_date", ["metricType", "date"]),
 });

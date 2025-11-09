@@ -16,12 +16,23 @@
       "routes/pricing": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/success": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/subscription-required": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/privacy": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/terms": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/cookies": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/aup": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/contact": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/index": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/chat": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/team": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/usage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/billing": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/dashboard/settings": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+      "routes/dashboard/settings": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/index": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/users": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/organizations": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/health": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/features": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/analytics": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
       "root": {
@@ -80,6 +91,51 @@
         "parentId": "root",
         "file": "app/routes/subscription-required.tsx",
         "path": "subscription-required",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/privacy": {
+        "id": "routes/privacy",
+        "parentId": "root",
+        "file": "app/routes/privacy.tsx",
+        "path": "privacy",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/terms": {
+        "id": "routes/terms",
+        "parentId": "root",
+        "file": "app/routes/terms.tsx",
+        "path": "terms",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/cookies": {
+        "id": "routes/cookies",
+        "parentId": "root",
+        "file": "app/routes/cookies.tsx",
+        "path": "cookies",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/aup": {
+        "id": "routes/aup",
+        "parentId": "root",
+        "file": "app/routes/aup.tsx",
+        "path": "aup",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/contact": {
+        "id": "routes/contact",
+        "parentId": "root",
+        "file": "app/routes/contact.tsx",
+        "path": "contact",
         "config": {
           "runtime": "nodejs"
         }
@@ -143,6 +199,66 @@
         "config": {
           "runtime": "nodejs"
         }
+      },
+      "routes/admin/layout": {
+        "id": "routes/admin/layout",
+        "parentId": "root",
+        "file": "app/routes/admin/layout.tsx",
+        "config": {}
+      },
+      "routes/admin/index": {
+        "id": "routes/admin/index",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/index.tsx",
+        "path": "admin",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/users": {
+        "id": "routes/admin/users",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/users.tsx",
+        "path": "admin/users",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/organizations": {
+        "id": "routes/admin/organizations",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/organizations.tsx",
+        "path": "admin/organizations",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/health": {
+        "id": "routes/admin/health",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/health.tsx",
+        "path": "admin/health",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/features": {
+        "id": "routes/admin/features",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/features.tsx",
+        "path": "admin/features",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/analytics": {
+        "id": "routes/admin/analytics",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/analytics.tsx",
+        "path": "admin/analytics",
+        "config": {
+          "runtime": "nodejs"
+        }
       }
     }
   },
@@ -199,6 +315,36 @@
         "file": "routes/subscription-required.tsx",
         "path": "subscription-required"
       },
+      "routes/privacy": {
+        "id": "routes/privacy",
+        "parentId": "root",
+        "file": "routes/privacy.tsx",
+        "path": "privacy"
+      },
+      "routes/terms": {
+        "id": "routes/terms",
+        "parentId": "root",
+        "file": "routes/terms.tsx",
+        "path": "terms"
+      },
+      "routes/cookies": {
+        "id": "routes/cookies",
+        "parentId": "root",
+        "file": "routes/cookies.tsx",
+        "path": "cookies"
+      },
+      "routes/aup": {
+        "id": "routes/aup",
+        "parentId": "root",
+        "file": "routes/aup.tsx",
+        "path": "aup"
+      },
+      "routes/contact": {
+        "id": "routes/contact",
+        "parentId": "root",
+        "file": "routes/contact.tsx",
+        "path": "contact"
+      },
       "routes/dashboard/layout": {
         "id": "routes/dashboard/layout",
         "parentId": "root",
@@ -239,6 +385,47 @@
         "parentId": "routes/dashboard/layout",
         "file": "routes/dashboard/settings.tsx",
         "path": "dashboard/settings"
+      },
+      "routes/admin/layout": {
+        "id": "routes/admin/layout",
+        "parentId": "root",
+        "file": "routes/admin/layout.tsx"
+      },
+      "routes/admin/index": {
+        "id": "routes/admin/index",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/index.tsx",
+        "path": "admin"
+      },
+      "routes/admin/users": {
+        "id": "routes/admin/users",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/users.tsx",
+        "path": "admin/users"
+      },
+      "routes/admin/organizations": {
+        "id": "routes/admin/organizations",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/organizations.tsx",
+        "path": "admin/organizations"
+      },
+      "routes/admin/health": {
+        "id": "routes/admin/health",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/health.tsx",
+        "path": "admin/health"
+      },
+      "routes/admin/features": {
+        "id": "routes/admin/features",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/features.tsx",
+        "path": "admin/features"
+      },
+      "routes/admin/analytics": {
+        "id": "routes/admin/analytics",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/analytics.tsx",
+        "path": "admin/analytics"
       }
     },
     "routeDiscovery": {
