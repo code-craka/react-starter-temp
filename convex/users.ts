@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 
 export const findUserByToken = query({
@@ -25,6 +25,38 @@ export const findUserByToken = query({
   },
 });
 
+/**
+ * Internal query to find user by token (used by HTTP endpoints)
+ */
+export const findUserByTokenInternal = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier))
+      .first();
+
+    return user;
+  },
+});
+
+export const getCurrentUser = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      return null;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.subject))
+      .unique();
+
+    return user;
+  },
+});
+
 export const upsertUser = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -40,16 +72,13 @@ export const upsertUser = mutation({
       .unique();
 
     if (existingUser) {
-      // Update if needed
-      if (
-        existingUser.name !== identity.name ||
-        existingUser.email !== identity.email
-      ) {
-        await ctx.db.patch(existingUser._id, {
-          name: identity.name,
-          email: identity.email,
-        });
-      }
+      // Update last login time
+      await ctx.db.patch(existingUser._id, {
+        name: identity.name,
+        email: identity.email,
+        lastLoginAt: Date.now(),
+        updatedAt: Date.now(),
+      });
       return existingUser;
     }
 
@@ -58,6 +87,9 @@ export const upsertUser = mutation({
       name: identity.name,
       email: identity.email,
       tokenIdentifier: identity.subject,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      lastLoginAt: Date.now(),
     });
 
     return await ctx.db.get(userId);

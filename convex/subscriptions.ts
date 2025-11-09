@@ -4,6 +4,67 @@ import { Webhook, WebhookVerificationError } from "standardwebhooks";
 import { api } from "./_generated/api";
 import { action, httpAction, mutation, query } from "./_generated/server";
 
+// Type guard to check if a price has amount and currency fields (fixed price)
+function hasPriceAmount(
+  price: unknown
+): price is { id: string; priceAmount: number; priceCurrency: string; recurringInterval?: string | null } {
+  return (
+    typeof price === 'object' &&
+    price !== null &&
+    'priceAmount' in price &&
+    'priceCurrency' in price &&
+    'id' in price
+  );
+}
+
+// Webhook event validator - matches Polar.sh webhook payload structure
+const subscriptionDataSchema = v.object({
+  id: v.string(),
+  status: v.union(
+    v.literal("incomplete"),
+    v.literal("incomplete_expired"),
+    v.literal("trialing"),
+    v.literal("active"),
+    v.literal("past_due"),
+    v.literal("canceled"),
+    v.literal("unpaid"),
+    v.literal("revoked")
+  ),
+  customer_id: v.string(),
+  product_id: v.string(),
+  amount: v.optional(v.number()),
+  currency: v.optional(v.string()),
+  price_id: v.optional(v.string()),
+  recurring_interval: v.optional(v.string()),
+  current_period_start: v.optional(v.string()),
+  current_period_end: v.optional(v.string()),
+  cancel_at_period_end: v.optional(v.boolean()),
+  started_at: v.optional(v.string()),
+  ended_at: v.optional(v.string()),
+  canceled_at: v.optional(v.string()),
+  customer_cancellation_reason: v.optional(v.string()),
+  customer_cancellation_comment: v.optional(v.string()),
+  discount_id: v.optional(v.string()),
+  checkout_id: v.optional(v.string()),
+  created_at: v.string(),
+  modified_at: v.optional(v.string()),
+  metadata: v.optional(v.any()),
+  custom_field_data: v.optional(v.any()),
+});
+
+const webhookEventSchema = v.object({
+  type: v.union(
+    v.literal("subscription.created"),
+    v.literal("subscription.updated"),
+    v.literal("subscription.active"),
+    v.literal("subscription.canceled"),
+    v.literal("subscription.uncanceled"),
+    v.literal("subscription.revoked"),
+    v.literal("order.created")
+  ),
+  data: subscriptionDataSchema,
+});
+
 const createCheckout = async ({
   customerEmail,
   productPriceId,
@@ -33,7 +94,7 @@ const createCheckout = async ({
   let productId = null;
   for (const product of productsResult.items) {
     const hasPrice = product.prices.some(
-      (price: any) => price.id === productPriceId
+      (price) => price.id === productPriceId
     );
     if (hasPrice) {
       productId = product.id;
@@ -77,18 +138,26 @@ export const getAvailablePlansQuery = query({
     });
 
     // Transform the data to remove Date objects and keep only needed fields
-    const cleanedItems = result.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      isRecurring: item.isRecurring,
-      prices: item.prices.map((price: any) => ({
-        id: price.id,
-        amount: price.priceAmount,
-        currency: price.priceCurrency,
-        interval: price.recurringInterval,
-      })),
-    }));
+    const cleanedItems = result.items.map((item) => {
+      const fixedPrices = item.prices.filter(hasPriceAmount) as Array<{
+        id: string;
+        priceAmount: number;
+        priceCurrency: string;
+        recurringInterval?: string | null;
+      }>;
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        isRecurring: item.isRecurring,
+        prices: fixedPrices.map((price) => ({
+          id: price.id,
+          amount: price.priceAmount,
+          currency: price.priceCurrency,
+          interval: price.recurringInterval ?? null,
+        })),
+      };
+    });
 
     return {
       items: cleanedItems,
@@ -110,18 +179,26 @@ export const getAvailablePlans = action({
     });
 
     // Transform the data to remove Date objects and keep only needed fields
-    const cleanedItems = result.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      isRecurring: item.isRecurring,
-      prices: item.prices.map((price: any) => ({
-        id: price.id,
-        amount: price.priceAmount,
-        currency: price.priceCurrency,
-        interval: price.recurringInterval,
-      })),
-    }));
+    const cleanedItems = result.items.map((item) => {
+      const fixedPrices = item.prices.filter(hasPriceAmount) as Array<{
+        id: string;
+        priceAmount: number;
+        priceCurrency: string;
+        recurringInterval?: string | null;
+      }>;
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        isRecurring: item.isRecurring,
+        prices: fixedPrices.map((price) => ({
+          id: price.id,
+          amount: price.priceAmount,
+          currency: price.priceCurrency,
+          interval: price.recurringInterval ?? null,
+        })),
+      };
+    });
 
     return {
       items: cleanedItems,
@@ -269,7 +346,7 @@ export const fetchUserSubscription = query({
 
 export const handleWebhookEvent = mutation({
   args: {
-    body: v.any(),
+    body: webhookEventSchema,
   },
   handler: async (ctx, args) => {
     // Extract event type from webhook payload
@@ -286,37 +363,86 @@ export const handleWebhookEvent = mutation({
 
     switch (eventType) {
       case "subscription.created":
-        // Insert new subscription
-        await ctx.db.insert("subscriptions", {
+        // Insert new subscription with all required fields
+        const subscriptionId = await ctx.db.insert("subscriptions", {
+          // Required Polar IDs
           polarId: args.body.data.id,
+          customerId: args.body.data.customer_id,
+          productId: args.body.data.product_id,
+
+          // Optional price ID
           polarPriceId: args.body.data.price_id,
-          currency: args.body.data.currency,
-          interval: args.body.data.recurring_interval,
-          userId: args.body.data.metadata.userId,
+
+          // Required pricing details
+          currency: args.body.data.currency || "USD",
+          amount: args.body.data.amount || 0,
+          interval: args.body.data.recurring_interval as "month" | "year" | undefined,
+
+          // User/org links
+          userId: args.body.data.metadata?.userId,
+          organizationId: args.body.data.metadata?.organizationId as any,
+
+          // Required status (validated by schema)
           status: args.body.data.status,
-          currentPeriodStart: new Date(
-            args.body.data.current_period_start
-          ).getTime(),
-          currentPeriodEnd: new Date(
-            args.body.data.current_period_end
-          ).getTime(),
-          cancelAtPeriodEnd: args.body.data.cancel_at_period_end,
-          amount: args.body.data.amount,
-          startedAt: new Date(args.body.data.started_at).getTime(),
+
+          // Required timestamps
+          createdAt: new Date(args.body.data.created_at).getTime(),
+          modifiedAt: args.body.data.modified_at
+            ? new Date(args.body.data.modified_at).getTime()
+            : undefined,
+          currentPeriodStart: args.body.data.current_period_start
+            ? new Date(args.body.data.current_period_start).getTime()
+            : Date.now(),
+          currentPeriodEnd: args.body.data.current_period_end
+            ? new Date(args.body.data.current_period_end).getTime()
+            : undefined,
+
+          // Required cancellation flag
+          cancelAtPeriodEnd: args.body.data.cancel_at_period_end || false,
+
+          // Optional timestamps
+          startedAt: args.body.data.started_at
+            ? new Date(args.body.data.started_at).getTime()
+            : undefined,
           endedAt: args.body.data.ended_at
             ? new Date(args.body.data.ended_at).getTime()
             : undefined,
           canceledAt: args.body.data.canceled_at
             ? new Date(args.body.data.canceled_at).getTime()
             : undefined,
+
+          // Cancellation details
           customerCancellationReason:
-            args.body.data.customer_cancellation_reason || undefined,
+            args.body.data.customer_cancellation_reason as any,
           customerCancellationComment:
             args.body.data.customer_cancellation_comment || undefined,
-          metadata: args.body.data.metadata || {},
-          customFieldData: args.body.data.custom_field_data || {},
-          customerId: args.body.data.customer_id,
+
+          // Additional Polar fields
+          discountId: args.body.data.discount_id,
+          checkoutId: args.body.data.checkout_id,
+
+          // Metadata
+          metadata: args.body.data.metadata
+            ? {
+                userId: args.body.data.metadata.userId,
+                organizationId: args.body.data.metadata.organizationId,
+                plan: args.body.data.metadata.plan,
+              }
+            : undefined,
+          customFieldData: args.body.data.custom_field_data,
         });
+
+        // Link subscription to organization if organizationId exists
+        if (args.body.data.metadata.organizationId) {
+          const orgId = args.body.data.metadata.organizationId as any;
+          const plan = args.body.data.metadata.plan || "pro";
+
+          await ctx.db.patch(orgId, {
+            subscriptionId: subscriptionId,
+            plan: plan,
+            updatedAt: Date.now(),
+          });
+        }
         break;
 
       case "subscription.updated":
@@ -328,17 +454,28 @@ export const handleWebhookEvent = mutation({
 
         if (existingSub) {
           await ctx.db.patch(existingSub._id, {
-            amount: args.body.data.amount,
+            ...(args.body.data.amount !== undefined && { amount: args.body.data.amount }),
             status: args.body.data.status,
-            currentPeriodStart: new Date(
-              args.body.data.current_period_start
-            ).getTime(),
-            currentPeriodEnd: new Date(
-              args.body.data.current_period_end
-            ).getTime(),
-            cancelAtPeriodEnd: args.body.data.cancel_at_period_end,
-            metadata: args.body.data.metadata || {},
-            customFieldData: args.body.data.custom_field_data || {},
+            ...(args.body.data.current_period_start && {
+              currentPeriodStart: new Date(args.body.data.current_period_start).getTime(),
+            }),
+            ...(args.body.data.current_period_end && {
+              currentPeriodEnd: new Date(args.body.data.current_period_end).getTime(),
+            }),
+            ...(args.body.data.cancel_at_period_end !== undefined && {
+              cancelAtPeriodEnd: args.body.data.cancel_at_period_end,
+            }),
+            ...(args.body.data.modified_at && {
+              modifiedAt: new Date(args.body.data.modified_at).getTime(),
+            }),
+            metadata: args.body.data.metadata
+              ? {
+                  userId: args.body.data.metadata.userId,
+                  organizationId: args.body.data.metadata.organizationId,
+                  plan: args.body.data.metadata.plan,
+                }
+              : existingSub.metadata,
+            customFieldData: args.body.data.custom_field_data || existingSub.customFieldData,
           });
         }
         break;
@@ -353,7 +490,9 @@ export const handleWebhookEvent = mutation({
         if (activeSub) {
           await ctx.db.patch(activeSub._id, {
             status: args.body.data.status,
-            startedAt: new Date(args.body.data.started_at).getTime(),
+            ...(args.body.data.started_at && {
+              startedAt: new Date(args.body.data.started_at).getTime(),
+            }),
           });
         }
         break;
@@ -368,13 +507,21 @@ export const handleWebhookEvent = mutation({
         if (canceledSub) {
           await ctx.db.patch(canceledSub._id, {
             status: args.body.data.status,
-            canceledAt: args.body.data.canceled_at
-              ? new Date(args.body.data.canceled_at).getTime()
-              : undefined,
-            customerCancellationReason:
-              args.body.data.customer_cancellation_reason || undefined,
-            customerCancellationComment:
-              args.body.data.customer_cancellation_comment || undefined,
+            ...(args.body.data.canceled_at && {
+              canceledAt: new Date(args.body.data.canceled_at).getTime(),
+            }),
+            ...(args.body.data.customer_cancellation_reason && {
+              customerCancellationReason: args.body.data.customer_cancellation_reason as
+                | "customer_service"
+                | "too_expensive"
+                | "missing_features"
+                | "switched_service"
+                | "unused"
+                | "other",
+            }),
+            ...(args.body.data.customer_cancellation_comment && {
+              customerCancellationComment: args.body.data.customer_cancellation_comment,
+            }),
           });
         }
         break;
@@ -493,7 +640,10 @@ export const paymentWebhook = httpAction(async (ctx, request) => {
 });
 
 export const createCustomerPortalUrl = action({
-  handler: async (ctx, args: { customerId: string }) => {
+  args: {
+    customerId: v.string(),
+  },
+  handler: async (ctx, args) => {
     const polar = new Polar({
       server: "sandbox",
       accessToken: process.env.POLAR_ACCESS_TOKEN,

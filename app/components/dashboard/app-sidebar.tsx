@@ -1,9 +1,10 @@
-import { IconDashboard, IconSettings } from "@tabler/icons-react";
-import { MessageCircle } from "lucide-react";
+import type { ClerkUser } from "~/types/clerk";
+import { LayoutDashboard, MessageCircle, Users, BarChart3, CreditCard, Settings } from "lucide-react";
 import { Link } from "react-router";
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+import { OrganizationSwitcher } from "./organization-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -18,19 +19,34 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: IconDashboard,
+      icon: LayoutDashboard,
     },
     {
       title: "Chat",
       url: "/dashboard/chat",
       icon: MessageCircle,
     },
+    {
+      title: "Team",
+      url: "/dashboard/team",
+      icon: Users,
+    },
+    {
+      title: "Usage",
+      url: "/dashboard/usage",
+      icon: BarChart3,
+    },
   ],
   navSecondary: [
     {
+      title: "Billing",
+      url: "/dashboard/billing",
+      icon: CreditCard,
+    },
+    {
       title: "Settings",
       url: "/dashboard/settings",
-      icon: IconSettings,
+      icon: Settings,
     },
   ],
 };
@@ -40,7 +56,7 @@ export function AppSidebar({
   user,
 }: {
   variant: "sidebar" | "floating" | "inset";
-  user: any;
+  user: ClerkUser;
 }) {
   return (
     <Sidebar collapsible="offcanvas" variant={variant}>
@@ -52,6 +68,9 @@ export function AppSidebar({
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="px-2 py-2">
+          <OrganizationSwitcher />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

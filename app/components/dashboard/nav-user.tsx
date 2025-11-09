@@ -1,4 +1,5 @@
 import { SignOutButton } from "@clerk/react-router";
+import type { NavUserProps } from "~/types/clerk";
 import {
   IconDotsVertical,
   IconLogout,
@@ -23,7 +24,7 @@ import {
 } from "~/components/ui/sidebar";
 import { useClerk } from "@clerk/react-router";
 
-export function NavUser({ user }: any) {
+export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar();
   const userFullName = user.firstName + " " + user.lastName;
   const userEmail = user.emailAddresses[0].emailAddress;
