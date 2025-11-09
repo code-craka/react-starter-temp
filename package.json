@@ -1,5 +1,32 @@
 {
-  "name": "my-react-router-app",
+  "name": "taskcoda",
+  "version": "2.0.0",
+  "description": "Modern, production-ready SaaS starter template with React Router v7, enhanced UI/UX, comprehensive testing, and enterprise features",
+  "author": {
+    "name": "Sayem Abdullah Rihan",
+    "email": "hello@techsci.io",
+    "url": "https://github.com/code-craka"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-craka/react-starter-temp.git"
+  },
+  "keywords": [
+    "react",
+    "react-router",
+    "saas",
+    "starter-template",
+    "convex",
+    "clerk",
+    "polar",
+    "typescript",
+    "tailwindcss",
+    "framer-motion",
+    "vitest",
+    "playwright",
+    "enterprise"
+  ],
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
