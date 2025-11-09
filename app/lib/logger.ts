@@ -1,5 +1,10 @@
 import pino from "pino";
 
+// Define strict type for log context
+interface LogContext {
+  [key: string]: string | number | boolean | string[] | Record<string, unknown>;
+}
+
 // Determine if we're in production
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -32,7 +37,7 @@ export const logger = pino({
 
 // Helper functions for common log patterns
 export const logAuth = {
-  success: (userId: string, email: string, context?: Record<string, any>) => {
+  success: (userId: string, email: string, context?: LogContext) => {
     logger.info(
       {
         event: "auth_success",
@@ -43,7 +48,7 @@ export const logAuth = {
       "User authenticated successfully"
     );
   },
-  failure: (email: string, reason: string, context?: Record<string, any>) => {
+  failure: (email: string, reason: string, context?: LogContext) => {
     logger.warn(
       {
         event: "auth_failure",
@@ -54,7 +59,7 @@ export const logAuth = {
       "Authentication failed"
     );
   },
-  logout: (userId: string, context?: Record<string, any>) => {
+  logout: (userId: string, context?: LogContext) => {
     logger.info(
       {
         event: "auth_logout",
@@ -71,7 +76,7 @@ export const logOrganization = {
     orgId: string,
     orgName: string,
     userId: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -88,7 +93,7 @@ export const logOrganization = {
     orgId: string,
     orgName: string,
     userId: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -105,7 +110,7 @@ export const logOrganization = {
     orgId: string,
     memberId: string,
     role: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -125,7 +130,7 @@ export const logSubscription = {
     subscriptionId: string,
     plan: string,
     amount: number,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -142,7 +147,7 @@ export const logSubscription = {
     subscriptionId: string,
     oldPlan: string,
     newPlan: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -158,7 +163,7 @@ export const logSubscription = {
   canceled: (
     subscriptionId: string,
     plan: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.info(
       {
@@ -174,7 +179,7 @@ export const logSubscription = {
     subscriptionId: string,
     amount: number,
     reason: string,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.error(
       {
@@ -195,7 +200,7 @@ export const logQuota = {
     metricType: string,
     usage: number,
     limit: number,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.warn(
       {
@@ -215,7 +220,7 @@ export const logQuota = {
     metricType: string,
     usage: number,
     limit: number,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.warn(
       {
@@ -237,7 +242,7 @@ export const logRateLimit = {
     identifier: string,
     endpoint: string,
     limit: number,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.warn(
       {
@@ -258,7 +263,7 @@ export const logError = {
     method: string,
     statusCode: number,
     error: Error,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.error(
       {
@@ -277,7 +282,7 @@ export const logError = {
     operation: string,
     table: string,
     error: Error,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.error(
       {
@@ -295,7 +300,7 @@ export const logError = {
     service: string,
     operation: string,
     error: Error,
-    context?: Record<string, any>
+    context?: LogContext
   ) => {
     logger.error(
       {

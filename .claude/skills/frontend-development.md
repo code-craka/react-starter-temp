@@ -592,3 +592,237 @@ function UsersTable({ users }) {
 ---
 
 **All components follow shadcn/ui and TailwindCSS v4 patterns.**
+
+---
+
+## TypeScript Strict Typing Guidelines
+
+### Prohibited Types
+
+**NEVER use these types** in the Taskcoda codebase:
+- ❌ `any` - Defeats type safety entirely
+- ❌ `null` - Use `undefined` instead for optional values
+- ❌ `unknown` - Use specific types or union types
+
+### Type Safety Rules
+
+1. **Always Use Exact Types**
+   ```typescript
+   // ❌ BAD - Using any
+   function handleData(data: any) {
+     return data.value;
+   }
+
+   // ✅ GOOD - Using exact types
+   interface UserData {
+     id: string;
+     name: string;
+     email: string;
+   }
+   function handleData(data: UserData) {
+     return data.name;
+   }
+   ```
+
+2. **Context Objects - Use Proper Types**
+   ```typescript
+   // ❌ BAD - Using Record<string, any>
+   interface LogContext {
+     [key: string]: any;
+   }
+
+   // ✅ GOOD - Define exact shape
+   interface LogContext {
+     [key: string]: string | number | boolean | Record<string, unknown>;
+   }
+   ```
+
+3. **Event Handlers - Proper Event Types**
+   ```typescript
+   // ❌ BAD - Using any
+   const handleClick = (e: any) => {
+     e.preventDefault();
+   };
+
+   // ✅ GOOD - Using proper event type
+   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+     e.preventDefault();
+   };
+   ```
+
+4. **API Responses - Define Interfaces**
+   ```typescript
+   // ❌ BAD - Any response
+   async function fetchUser(): Promise<any> {
+     return fetch('/api/user');
+   }
+
+   // ✅ GOOD - Typed response
+   interface ApiResponse<T> {
+     data: T;
+     error?: string;
+   }
+   
+   interface User {
+     id: string;
+     name: string;
+     email: string;
+   }
+   
+   async function fetchUser(): Promise<ApiResponse<User>> {
+     const response = await fetch('/api/user');
+     return response.json();
+   }
+   ```
+
+5. **Props - Explicit Interface Definition**
+   ```typescript
+   // ❌ BAD - Props with any
+   export function MyComponent({ data }: { data: any }) {
+     return <div>{data}</div>;
+   }
+
+   // ✅ GOOD - Explicit props interface
+   interface MyComponentProps {
+     data: {
+       title: string;
+       description: string;
+       count: number;
+     };
+   }
+   
+   export function MyComponent({ data }: MyComponentProps) {
+     return (
+       <div>
+         <h1>{data.title}</h1>
+         <p>{data.description}</p>
+         <span>{data.count}</span>
+       </div>
+     );
+   }
+   ```
+
+6. **Environment Variables - Proper Access Pattern**
+   ```typescript
+   // ❌ BAD - Using process.env on client
+   const apiKey = process.env.API_KEY;
+
+   // ✅ GOOD - Using import.meta.env with VITE_ prefix
+   const apiKey = import.meta.env.VITE_API_KEY;
+   
+   // For type safety, define env types
+   interface ImportMetaEnv {
+     readonly VITE_API_KEY: string;
+     readonly VITE_SENTRY_DSN: string;
+     readonly MODE: string;
+   }
+   ```
+
+7. **Null vs Undefined**
+   ```typescript
+   // ❌ BAD - Using null
+   interface User {
+     email: string | null;
+   }
+
+   // ✅ GOOD - Using undefined
+   interface User {
+     email?: string; // This is string | undefined
+   }
+   ```
+
+8. **Error Handling - Typed Errors**
+   ```typescript
+   // ❌ BAD - Catch with any
+   try {
+     await riskyOperation();
+   } catch (error: any) {
+     console.error(error.message);
+   }
+
+   // ✅ GOOD - Typed error handling
+   try {
+     await riskyOperation();
+   } catch (error) {
+     if (error instanceof Error) {
+       console.error(error.message);
+     } else {
+       console.error('Unknown error occurred');
+     }
+   }
+   ```
+
+### Type Utility Patterns
+
+1. **Pick and Omit**
+   ```typescript
+   interface User {
+     id: string;
+     name: string;
+     email: string;
+     password: string;
+   }
+
+   // Public user data (omit sensitive fields)
+   type PublicUser = Omit<User, 'password'>;
+
+   // User update data (pick mutable fields)
+   type UserUpdate = Pick<User, 'name' | 'email'>;
+   ```
+
+2. **Partial and Required**
+   ```typescript
+   // For updates where all fields are optional
+   type UserPartialUpdate = Partial<User>;
+
+   // For ensuring all fields are required
+   type UserComplete = Required<User>;
+   ```
+
+3. **Union Types for Variants**
+   ```typescript
+   type ButtonVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+   type ButtonSize = 'sm' | 'default' | 'lg' | 'icon';
+
+   interface ButtonProps {
+     variant?: ButtonVariant;
+     size?: ButtonSize;
+     children: React.ReactNode;
+   }
+   ```
+
+### TypeScript Configuration
+
+Ensure `tsconfig.json` has strict mode enabled:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true
+  }
+}
+```
+
+### Code Review Checklist
+
+Before committing code, verify:
+- ✅ No `any` types used
+- ✅ No `null` values (use `undefined` instead)
+- ✅ No `unknown` types (use specific types)
+- ✅ All props have explicit interfaces
+- ✅ All API responses are typed
+- ✅ Environment variables use `import.meta.env` on client
+- ✅ Error handling is properly typed
+- ✅ All function parameters have explicit types
+- ✅ All return types are explicitly defined
+
+---
+
+**Remember**: Strict typing prevents runtime errors, improves IDE autocomplete, makes refactoring safer, and serves as living documentation. Always prefer explicit types over loose typing.
+

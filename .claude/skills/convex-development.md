@@ -1046,3 +1046,271 @@ export const checkRateLimit = action({ ... });
 ---
 
 **All examples are from the production Taskcoda codebase.**
+
+---
+
+## TypeScript Strict Typing Guidelines for Convex
+
+### Prohibited Types
+
+**NEVER use these types** in Convex functions:
+- ❌ `any` - Defeats type safety entirely
+- ❌ `null` - Use `undefined` instead
+- ❌ `unknown` - Use specific types or Convex validators
+
+### Convex-Specific Type Safety
+
+1. **Context Types - Always Use Generated Types**
+   ```typescript
+   // ❌ BAD - Using any for context
+   export const myQuery = query({
+     handler: async (ctx: any) => {
+       return await ctx.db.query("users").collect();
+     },
+   });
+
+   // ✅ GOOD - Using proper Convex types
+   import { QueryCtx, MutationCtx, ActionCtx } from "./_generated/server";
+   
+   export const myQuery = query({
+     handler: async (ctx: QueryCtx) => {
+       return await ctx.db.query("users").collect();
+     },
+   });
+   ```
+
+2. **Use Convex Validators for Arguments**
+   ```typescript
+   import { v } from "convex/values";
+
+   // ❌ BAD - No validation
+   export const createUser = mutation({
+     handler: async (ctx, args: any) => {
+       return await ctx.db.insert("users", args);
+     },
+   });
+
+   // ✅ GOOD - With validators
+   export const createUser = mutation({
+     args: {
+       name: v.string(),
+       email: v.string(),
+       age: v.optional(v.number()),
+     },
+     handler: async (ctx, args) => {
+       // args is automatically typed!
+       return await ctx.db.insert("users", {
+         name: args.name,
+         email: args.email,
+         age: args.age,
+       });
+     },
+   });
+   ```
+
+3. **Action Context Types**
+   ```typescript
+   // ❌ BAD
+   export const sendEmail = action({
+     handler: async (ctx: any, args: any) => {
+       await ctx.runMutation(internal.emails.send, args);
+     },
+   });
+
+   // ✅ GOOD
+   export const sendEmail = action({
+     args: {
+       to: v.string(),
+       subject: v.string(),
+       body: v.string(),
+     },
+     handler: async (ctx: ActionCtx, args) => {
+       await ctx.runMutation(internal.emails.send, {
+         to: args.to,
+         subject: args.subject,
+         body: args.body,
+       });
+     },
+   });
+   ```
+
+4. **Database Query Results**
+   ```typescript
+   import { Doc } from "./_generated/dataModel";
+
+   // ❌ BAD - Untyped result
+   export const getUser = query({
+     args: { userId: v.id("users") },
+     handler: async (ctx, args): Promise<any> => {
+       return await ctx.db.get(args.userId);
+     },
+   });
+
+   // ✅ GOOD - Properly typed
+   export const getUser = query({
+     args: { userId: v.id("users") },
+     handler: async (ctx, args): Promise<Doc<"users"> | null> => {
+       return await ctx.db.get(args.userId);
+     },
+   });
+   ```
+
+5. **Null vs Undefined in Convex**
+   ```typescript
+   // ❌ BAD - Using null
+   export const schema = defineSchema({
+     users: defineTable({
+       email: v.union(v.string(), v.null()),
+     }),
+   });
+
+   // ✅ GOOD - Using optional
+   export const schema = defineSchema({
+     users: defineTable({
+       email: v.optional(v.string()),
+     }),
+   });
+   ```
+
+### Convex Validator Patterns
+
+```typescript
+import { v } from "convex/values";
+
+// String validators
+v.string()                     // Required string
+v.optional(v.string())         // Optional string
+
+// Number validators
+v.number()                     // Any number
+v.int64()                      // Integer
+v.float64()                    // Float
+
+// Boolean
+v.boolean()
+
+// ID references
+v.id("tableName")              // Reference to table
+
+// Arrays
+v.array(v.string())            // Array of strings
+v.array(v.object({            // Array of objects
+  name: v.string(),
+  age: v.number(),
+}))
+
+// Objects
+v.object({
+  name: v.string(),
+  email: v.string(),
+  metadata: v.optional(v.object({
+    lastLogin: v.number(),
+  })),
+})
+
+// Union types
+v.union(
+  v.literal("active"),
+  v.literal("inactive"),
+  v.literal("suspended")
+)
+
+// Any (avoid if possible!)
+v.any()  // ❌ Try to avoid, use specific validator
+```
+
+### Type-Safe Mutations
+
+```typescript
+import { v } from "convex/values";
+import { mutation } from "./_generated/server";
+
+export const updateOrganization = mutation({
+  args: {
+    orgId: v.id("organizations"),
+    updates: v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+      settings: v.optional(v.object({
+        allowPublicJoin: v.boolean(),
+        maxMembers: v.number(),
+      })),
+    }),
+  },
+  handler: async (ctx, args) => {
+    // Fully typed args!
+    const org = await ctx.db.get(args.orgId);
+    if (!org) {
+      throw new Error("Organization not found");
+    }
+
+    await ctx.db.patch(args.orgId, args.updates);
+    return org;
+  },
+});
+```
+
+### HTTP Actions with Proper Types
+
+```typescript
+import { httpAction } from "./_generated/server";
+import { ActionCtx } from "./_generated/server";
+
+// ❌ BAD
+http.route({
+  path: "/api/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx: any, request) => {
+    // ...
+  }),
+});
+
+// ✅ GOOD
+http.route({
+  path: "/api/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx: ActionCtx, request: Request) => {
+    const body = await request.json();
+    
+    // Validate body structure
+    if (!isValidWebhookPayload(body)) {
+      return new Response("Invalid payload", { status: 400 });
+    }
+
+    // Process with typed data
+    await processWebhook(ctx, body as WebhookPayload);
+    return new Response("OK", { status: 200 });
+  }),
+});
+
+interface WebhookPayload {
+  event: string;
+  data: Record<string, string | number | boolean>;
+}
+
+function isValidWebhookPayload(body: unknown): body is WebhookPayload {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    "event" in body &&
+    "data" in body
+  );
+}
+```
+
+### Code Review Checklist for Convex
+
+Before committing Convex code:
+- ✅ All query/mutation/action handlers use proper `Ctx` types
+- ✅ All arguments use Convex validators
+- ✅ No `any` types used
+- ✅ No `null` values (use `undefined` or `v.optional()`)
+- ✅ Return types are explicitly defined
+- ✅ Database operations use generated `Doc` types
+- ✅ HTTP actions properly type Request/Response
+- ✅ Error handling doesn't catch with `any`
+
+---
+
+**Remember**: Convex provides excellent type safety through its generated types and validators. Always use them for bulletproof backend code.
+

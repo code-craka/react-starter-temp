@@ -1142,3 +1142,49 @@ const membersWithDetails = await Promise.all(
 ---
 
 **This architecture is production-tested and powers Taskcoda's enterprise SaaS platform.**
+
+---
+
+## TypeScript Strict Typing Guidelines
+
+### Core Rules for Taskcoda Development
+
+**PROHIBITED TYPES** - Never use:
+- ❌ `any` - Defeats type safety
+- ❌ `null` - Use `undefined` instead  
+- ❌ `unknown` - Use specific types
+
+**REQUIRED PRACTICES**:
+1. ✅ Always define explicit interfaces for props, API responses, and data structures
+2. ✅ Use Convex validators (`v.string()`, `v.number()`, etc.) for all mutations/queries
+3. ✅ Import proper context types: `QueryCtx`, `MutationCtx`, `ActionCtx` from Convex
+4. ✅ Use `import.meta.env.VITE_*` for client-side environment variables (not `process.env`)
+5. ✅ Define return types explicitly for all functions
+6. ✅ Use union types for variants: `type Status = 'active' | 'inactive' | 'suspended'`
+7. ✅ Prefer `undefined` over `null` for optional values
+8. ✅ Type error handling properly with `instanceof Error` checks
+
+**Quick Examples**:
+
+```typescript
+// ❌ BAD
+function handleData(data: any) { }
+const config: Record<string, any> = {};
+catch (error: any) { }
+
+// ✅ GOOD
+interface UserData { id: string; name: string; }
+function handleData(data: UserData) { }
+
+interface Config { [key: string]: string | number | boolean; }
+const config: Config = {};
+
+catch (error) {
+  if (error instanceof Error) {
+    console.error(error.message);
+  }
+}
+```
+
+**See `frontend-development.md` and `convex-development.md` for comprehensive TypeScript guidelines.**
+

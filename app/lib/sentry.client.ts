@@ -1,13 +1,18 @@
 import * as Sentry from "@sentry/react";
 
+// Define strict types for Sentry context
+interface SentryContext {
+  [key: string]: string | number | boolean | Record<string, unknown>;
+}
+
 // Initialize Sentry for client-side error tracking
 export function initSentry() {
-  const dsn = process.env.SENTRY_DSN;
-  const environment = process.env.NODE_ENV || "development";
+  const dsn = import.meta.env.VITE_SENTRY_DSN;
+  const environment = import.meta.env.MODE || "development";
 
   // Only initialize if DSN is provided
   if (!dsn) {
-    console.warn("SENTRY_DSN not configured - error tracking disabled");
+    console.warn("VITE_SENTRY_DSN not configured - error tracking disabled");
     return;
   }
 
@@ -16,7 +21,7 @@ export function initSentry() {
     environment,
 
     // Release tracking with git commit SHA
-    release: process.env.VITE_GIT_COMMIT_SHA || "development",
+    release: import.meta.env.VITE_GIT_COMMIT_SHA || "development",
 
     // Set sample rates
     tracesSampleRate: environment === "production" ? 0.1 : 1.0,
@@ -101,7 +106,7 @@ export function clearSentryUser() {
 export function captureSentryEvent(
   message: string,
   level: Sentry.SeverityLevel,
-  context?: Record<string, any>
+  context?: SentryContext
 ) {
   Sentry.captureMessage(message, {
     level,
@@ -112,7 +117,7 @@ export function captureSentryEvent(
 // Helper to capture errors with context
 export function captureSentryError(
   error: Error,
-  context?: Record<string, any>
+  context?: SentryContext
 ) {
   Sentry.captureException(error, {
     extra: context,
@@ -123,7 +128,7 @@ export function captureSentryError(
 export function addSentryBreadcrumb(
   message: string,
   category: string,
-  data?: Record<string, any>
+  data?: SentryContext
 ) {
   Sentry.addBreadcrumb({
     message,
