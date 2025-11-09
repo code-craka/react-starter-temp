@@ -17,6 +17,34 @@ import { cn } from "~/lib/utils";
 import { Navbar } from "./navbar";
 import { Sparkles, Zap, Rocket } from "lucide-react";
 
+// Custom hook to inject gradient animation styles (client-side only)
+function useGradientStyles() {
+  useEffect(() => {
+    // Only run on client side
+    const style = document.createElement('style');
+    style.id = 'gradient-animation-styles';
+    style.textContent = `
+      @keyframes gradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      .animate-gradient {
+        animation: gradient 3s ease infinite;
+      }
+      .bg-300\\% { background-size: 300% 300%; }
+    `;
+    document.head.appendChild(style);
+
+    // Cleanup: remove style tag on unmount
+    return () => {
+      const existingStyle = document.getElementById('gradient-animation-styles');
+      if (existingStyle) {
+        document.head.removeChild(existingStyle);
+      }
+    };
+  }, []);
+}
+
 export default function HeroEnhanced({
   loaderData,
 }: {
@@ -24,6 +52,9 @@ export default function HeroEnhanced({
 }) {
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
   const controls = useAnimation();
+
+  // Inject gradient animation styles on client side only
+  useGradientStyles();
 
   useEffect(() => {
     if (inView) {
@@ -358,19 +389,3 @@ const GlowButton = memo(({ children, className, ...props }: any) => {
     </div>
   );
 });
-
-// Add CSS for gradient animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes gradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  .animate-gradient {
-    animation: gradient 3s ease infinite;
-  }
-  .bg-300\\% { background-size: 300% 300%; }
-`;
-if (typeof document !== 'undefined') {
-  document.head.appendChild(style);
-}
