@@ -20,6 +20,7 @@
       "routes/dashboard/chat": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/team": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/usage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard/billing": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/dashboard/settings": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
@@ -125,6 +126,15 @@
           "runtime": "nodejs"
         }
       },
+      "routes/dashboard/billing": {
+        "id": "routes/dashboard/billing",
+        "parentId": "routes/dashboard/layout",
+        "file": "app/routes/dashboard/billing.tsx",
+        "path": "dashboard/billing",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
       "routes/dashboard/settings": {
         "id": "routes/dashboard/settings",
         "parentId": "routes/dashboard/layout",
@@ -217,6 +227,12 @@
         "parentId": "routes/dashboard/layout",
         "file": "routes/dashboard/usage.tsx",
         "path": "dashboard/usage"
+      },
+      "routes/dashboard/billing": {
+        "id": "routes/dashboard/billing",
+        "parentId": "routes/dashboard/layout",
+        "file": "routes/dashboard/billing.tsx",
+        "path": "dashboard/billing"
       },
       "routes/dashboard/settings": {
         "id": "routes/dashboard/settings",
