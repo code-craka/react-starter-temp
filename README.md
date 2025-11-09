@@ -2,7 +2,7 @@
 
 # 🚀 Taskcoda - Modern SaaS Starter Template
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/code-craka/react-starter-temp)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/code-craka/react-starter-temp)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React Router](https://img.shields.io/badge/React_Router-v7.5.3-CA4245?logo=react-router&logoColor=white)](https://reactrouter.com)
 [![React](https://img.shields.io/badge/React-v19.1.0-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -276,9 +276,12 @@
 
 4. **Configure your `.env.local`**
    ```bash
-   # Convex Configuration
-   CONVEX_DEPLOYMENT=your_convex_deployment_here
-   VITE_CONVEX_URL=your_convex_url_here
+   # Convex Production Deployment
+   CONVEX_DEPLOYMENT=prod:your_deployment_name
+   VITE_CONVEX_URL=https://your_deployment.convex.cloud
+   CONVEX_DEPLOY_KEY=prod:your_deployment_name|your_key_here
+   CONVEX_CLOUD_URL=https://your_deployment.convex.cloud
+   CONVEX_SITE_URL=https://your_deployment.convex.site
 
    # Clerk Authentication
    VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
@@ -288,9 +291,17 @@
    POLAR_ACCESS_TOKEN=your_polar_access_token_here
    POLAR_ORGANIZATION_ID=your_polar_organization_id_here
    POLAR_WEBHOOK_SECRET=your_polar_webhook_secret_here
+   POLAR_SERVER=sandbox  # or "production"
 
    # OpenAI Configuration
    OPENAI_API_KEY=your_openai_api_key_here
+
+   # Sentry Error Tracking
+   VITE_SENTRY_DSN=your_sentry_dsn_here
+
+   # Upstash Redis (Rate Limiting)
+   UPSTASH_REDIS_REST_URL=your_upstash_url_here
+   UPSTASH_REDIS_REST_TOKEN=your_upstash_token_here
 
    # Frontend URL
    FRONTEND_URL=http://localhost:5173
@@ -483,7 +494,11 @@ Deploy the `build/` directory to any Node.js hosting platform.
 | `POLAR_ACCESS_TOKEN` | Polar.sh API token | ✅ |
 | `POLAR_ORGANIZATION_ID` | Polar.sh org ID | ✅ |
 | `POLAR_WEBHOOK_SECRET` | Polar.sh webhook secret | ✅ |
+| `POLAR_SERVER` | Polar server mode | ✅ |
 | `OPENAI_API_KEY` | OpenAI API key | ✅ |
+| `VITE_SENTRY_DSN` | Sentry error tracking DSN | ✅ |
+| `UPSTASH_REDIS_REST_URL` | Redis cache URL | ✅ |
+| `UPSTASH_REDIS_REST_TOKEN` | Redis auth token | ✅ |
 | `FRONTEND_URL` | Frontend URL | ✅ |
 
 </details>
@@ -493,9 +508,9 @@ Deploy the `build/` directory to any Node.js hosting platform.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SENTRY_DSN` | Sentry error tracking | - |
-| `UPSTASH_REDIS_URL` | Redis cache URL | - |
 | `RESEND_API_KEY` | Email service key | - |
+| `FROM_EMAIL` | Email sender address | - |
+| `VITE_GIT_COMMIT_SHA` | Git commit for Sentry | auto |
 
 </details>
 
@@ -571,12 +586,12 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-### Latest Version: v2.0.0
-- 🎨 Complete UI/UX transformation
-- 🧪 Comprehensive testing infrastructure
-- 📈 Enterprise observability
-- 👥 Admin panel
-- 🤖 Claude Desktop integration
+### Latest Version: v2.1.0
+- 🐛 Critical bug fixes for production stability
+- 🔧 Polar.sh SDK compatibility improvements
+- 🎯 Sentry SDK v10+ configuration updates
+- ✨ Missing Convex API endpoint implementation
+- 🎨 Icon type consistency improvements
 
 [View Full Changelog](CHANGELOG.md)
 

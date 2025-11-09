@@ -1,370 +1,336 @@
-# Taskcoda - Project Documentation
+# Taskcoda - Claude Code Assistant Documentation
 
 **Product**: Taskcoda - Enterprise Task Management SaaS Platform
 **Company**: TechSci, Inc.
 **Contact**: hello@techsci.io
-**Version**: 1.0.0
+**Version**: 2.1.0
+**Last Updated**: 2025-01-09
 
 ---
 
-## Project Overview
+## 📋 Project Status
 
-### Product Description
-Taskcoda is a modern, production-ready task management SaaS platform designed for teams and organizations. Built with enterprise-grade features including multi-tenancy, RBAC, usage metering, audit logging, and comprehensive admin capabilities.
+### Current Version: v2.1.0 (Production Ready)
 
-###Key Features
-- **Multi-Tenancy**: Organization-based isolation with team management
-- **RBAC**: Role-Based Access Control (Owner, Admin, Member, Super Admin)
-- **Subscription Billing**: Polar.sh integration with Free, Pro, and Enterprise plans
-- **Usage Metering**: Track AI messages, API calls, storage, and enforce quotas
-- **Rate Limiting**: Upstash Redis-based rate limiting per user and organization
-- **Audit Logging**: Immutable audit trails for SOC 2, GDPR, HIPAA compliance
-- **Admin Panel**: Comprehensive super admin dashboard for system management
-- **AI Chat**: OpenAI-powered chat functionality with usage tracking
-- **Team Collaboration**: Invite members, manage roles, team permissions
-- **Email Notifications**: Resend integration for transactional emails
-- **Real-time Updates**: Convex real-time subscriptions across all features
-- **Monitoring**: Sentry integration for error tracking and performance
-- **Testing**: Comprehensive test suite with Vitest, Playwright, and k6
+**Build Status**: ✅ **PASSING**
+**TypeScript Errors**: 80 (down from 85 - see breakdown below)
+**Production Deployment**: Vercel + Convex Production
+**Test Coverage**: Unit, E2E, and Load tests configured
+
+### Recent Session Summary (2025-01-09)
+
+#### 🎯 Goals Accomplished
+
+1. **✅ Identified and Implemented Missing Convex API Endpoints**
+   - Scanned all route and component files for API calls
+   - Found only 1 missing endpoint: `api.organizations.getTeamMemberRole`
+   - Implemented with proper validators, TypeScript types, and authentication
+   - Location: `convex/organizations.ts:658-688`
+
+2. **✅ Fixed Sentry SDK v10+ Configuration Issues**
+   - Removed deprecated `reactRouterV6Instrumentation`
+   - Updated to use `browserTracingIntegration()` for React SDK v10+
+   - React Router v7 now auto-detected and instrumented
+   - Added `VITE_SENTRY_DSN` to environment variables
+   - Location: `app/lib/sentry.client.ts:33`
+
+3. **✅ Resolved Icon Type Mismatches in Sidebar Components**
+   - Replaced Tabler icons with Lucide React for consistency
+   - Updated `NavMain` and `NavSecondary` to use `LucideIcon` type
+   - All sidebar icons now use Lucide React library
+   - Locations: `app/components/dashboard/{app-sidebar,nav-main,nav-secondary}.tsx`
+
+4. **✅ Fixed Polar.sh SDK cancel() Method Error**
+   - Replaced `polar.subscriptions.cancel()` with `polar.subscriptions.revoke()`
+   - Admin API uses `revoke()` for immediate cancellation with access token auth
+   - Customer Portal uses `cancel()` with customer session auth
+   - Location: `convex/billing.ts:224`
+
+5. **✅ Updated Convex Production Deployment Configuration**
+   - Migrated from `knowing-gazelle-94` to `prod:grateful-panther-627`
+   - Added `CONVEX_DEPLOY_KEY` for authenticated deployments
+   - Updated all Convex URLs to production endpoints
+
+#### 📊 TypeScript Error Reduction
+
+| Status | Count | Category |
+|--------|-------|----------|
+| **Before** | **85** | Total errors |
+| **After** | **80** | Current total |
+| **Reduction** | **-5** | Errors fixed this session |
+
+**Error Breakdown (80 total):**
+- ✅ Polar SDK errors: **0** (all fixed)
+- ✅ Sentry SDK errors: **0** (all fixed)
+- ✅ Icon type errors: **0** (all fixed)
+- ⚠️ Convex type generation: **61** (requires `npx convex dev`)
+- ℹ️ Code quality issues: **19** (implicit any, minor types)
+
+**Next Steps:**
+- Run `npx convex dev` locally to regenerate API types
+- This will reduce errors from 80 → ~19
+- Remaining errors are minor code quality improvements
+
+---
+
+## 🏗️ Architecture Overview
 
 ### Tech Stack
 
-#### Frontend
-- **React Router v7**: Full-stack React framework with SSR
-- **TypeScript**: Type safety throughout the application
-- **TailwindCSS v4**: Modern utility-first CSS framework
-- **shadcn/ui**: Component library built on Radix UI primitives
-- **Framer Motion**: Smooth animations and transitions
-- **Lucide React & Tabler Icons**: Icon libraries
-- **Recharts**: Data visualization for analytics
-- **React Markdown**: Markdown rendering for content
+**Frontend:**
+- React Router v7.5.3 (Full-stack React framework with SSR)
+- React v19.1.0
+- TypeScript v5.8.3
+- TailwindCSS v4.1.4
+- shadcn/ui + Radix UI
+- Framer Motion v12.23.24
+- Lucide React icons
 
-#### Backend & Infrastructure
-- **Convex**: Real-time serverless database and backend functions
-- **Clerk**: Authentication and user management
-- **Polar.sh**: Subscription billing and payment management
-- **Upstash Redis**: Rate limiting and caching
-- **OpenAI**: AI chat capabilities via Vercel AI SDK
-- **Resend**: Transactional email service
-- **Sentry**: Error tracking and performance monitoring
+**Backend & Services:**
+- Convex (Real-time serverless database)
+- Clerk (Authentication)
+- Polar.sh (Subscription billing)
+- OpenAI (AI chat via Vercel AI SDK)
+- Upstash Redis (Rate limiting & caching)
+- Resend (Email notifications)
+- Sentry (Error tracking & performance monitoring)
 
-#### Development & Deployment
-- **Vite**: Fast build tool with HMR
-- **Vitest**: Unit and integration testing
-- **Playwright**: E2E cross-browser testing
-- **k6**: Load and performance testing
-- **Vercel**: Production deployment platform
-- **GitHub Actions**: CI/CD pipelines
+**Testing:**
+- Vitest v4.0.8 (Unit tests)
+- Playwright v1.56.1 (E2E tests)
+- k6 (Load testing)
+- MSW (API mocking)
+
+**Deployment:**
+- Vercel (Frontend hosting)
+- Convex Production: `prod:grateful-panther-627`
+- Docker support for container deployments
 
 ---
 
-## Codebase Structure
+## 📂 Codebase Structure
+
+### Key Directories
 
 ```
 taskcoda/
-├── app/                              # Frontend Application (React Router v7)
-│   ├── components/                   # Reusable UI components
-│   │   ├── ui/                      # shadcn/ui components (25+ components)
-│   │   │   ├── button.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── table.tsx
-│   │   │   ├── card.tsx
-│   │   │   └── [20+ more components]
-│   │   ├── dashboard/               # Dashboard-specific components
-│   │   │   ├── organization-switcher.tsx
-│   │   │   ├── create-organization-dialog.tsx
-│   │   │   ├── team-management.tsx
-│   │   │   └── onboarding-flow.tsx
-│   │   ├── legal/                   # Legal page components
-│   │   │   ├── privacy-policy.tsx
-│   │   │   ├── terms-of-service.tsx
-│   │   │   └── cookie-policy.tsx
-│   │   └── admin/                   # Admin panel components
-│   ├── routes/                      # Application routes
-│   │   ├── home.tsx                # Landing page
-│   │   ├── pricing.tsx             # Pricing page
-│   │   ├── contact.tsx             # Contact form
-│   │   ├── sign-in.tsx             # Sign in page
-│   │   ├── sign-up.tsx             # Sign up page
-│   │   ├── success.tsx             # Payment success
-│   │   ├── subscription-required.tsx
-│   │   ├── dashboard/              # Protected dashboard routes
-│   │   │   ├── layout.tsx          # Dashboard layout with sidebar
-│   │   │   ├── index.tsx           # Dashboard home
-│   │   │   ├── chat.tsx            # AI chat interface
-│   │   │   ├── team.tsx            # Team management
-│   │   │   ├── usage.tsx           # Usage analytics
-│   │   │   ├── billing.tsx         # Billing management
-│   │   │   └── settings.tsx        # User settings
-│   │   ├── admin/                  # Super admin routes
-│   │   │   ├── layout.tsx          # Admin layout
-│   │   │   ├── index.tsx           # Admin dashboard
-│   │   │   ├── users.tsx           # User management
-│   │   │   ├── organizations.tsx   # Organization management
-│   │   │   ├── health.tsx          # System health
-│   │   │   ├── features.tsx        # Feature flags
-│   │   │   ├── analytics.tsx       # Analytics dashboard
-│   │   │   └── monitoring.tsx      # Monitoring dashboard
-│   │   └── [legal routes]          # Privacy, Terms, AUP, Cookies
-│   ├── lib/                        # Utilities and helpers
-│   │   ├── logger.ts               # Structured logging with Pino
-│   │   ├── utils.ts                # Common utilities
-│   │   └── sentry.client.ts        # Sentry error tracking
-│   ├── root.tsx                    # App entry point
-│   └── routes.ts                   # Route configuration
-├── convex/                          # Backend (Convex Serverless)
-│   ├── schema.ts                   # Database schema (11 tables)
-│   ├── auth.config.ts              # Clerk authentication config
-│   ├── users.ts                    # User management functions
-│   ├── organizations.ts            # Organization & team CRUD + RBAC
-│   ├── billing.ts                  # Subscription management (Polar.sh)
-│   ├── subscriptions.ts            # Webhook handlers for payments
-│   ├── usageMetrics.ts             # Usage tracking & quota enforcement
-│   ├── rateLimit.ts                # Rate limiting logic (Upstash Redis)
-│   ├── auditLogs.ts                # Audit logging for compliance
-│   ├── chatMessages.ts             # Chat message persistence
-│   ├── contact.ts                  # Contact form submissions
-│   ├── emails.ts                   # Email sending (Resend)
-│   ├── admin.ts                    # Admin panel backend (22 functions)
-│   ├── health.ts                   # Health check endpoints
-│   ├── http.ts                     # HTTP endpoints & webhooks
-│   └── lib/                        # Convex utilities
-│       └── sentry.ts               # Server-side Sentry
-├── tests/                           # Test Suite
-│   ├── unit/                       # Unit tests (Vitest)
-│   │   └── logger.test.ts
-│   ├── e2e/                        # E2E tests (Playwright)
-│   │   ├── homepage.spec.ts
-│   │   └── admin-panel.spec.ts
-│   ├── load/                       # Load tests (k6)
-│   │   └── api-endpoints.js
-│   ├── fixtures/                   # Test fixtures and mocks
-│   │   ├── users.ts
-│   │   ├── organizations.ts
-│   │   └── subscriptions.ts
-│   └── setup.ts                    # Test environment setup
-├── .github/                         # GitHub Configuration
-│   └── workflows/
-│       └── test.yml                # CI/CD pipeline
-├── docs/                            # Documentation
-│   └── TESTING.md                  # Testing guide
-├── public/                          # Static assets
-├── .env.example                     # Environment variables template
-├── package.json                     # Dependencies and scripts
-├── vitest.config.ts                # Vitest configuration
-├── playwright.config.ts            # Playwright configuration
-├── tailwind.config.ts              # TailwindCSS configuration
-├── tsconfig.json                   # TypeScript configuration
-└── react-router.config.ts          # React Router configuration
+├── app/                    # Frontend application
+│   ├── components/
+│   │   ├── ui/            # shadcn/ui components (25+)
+│   │   ├── homepage/      # Landing page sections
+│   │   ├── dashboard/     # Dashboard components
+│   │   └── legal/         # Legal page components
+│   ├── routes/
+│   │   ├── home.tsx       # Landing page
+│   │   ├── dashboard/     # Protected routes
+│   │   └── admin/         # Admin panel routes
+│   ├── lib/               # Utilities
+│   │   ├── sentry.client.ts  # Sentry error tracking
+│   │   ├── logger.ts         # Pino logging
+│   │   └── utils.ts          # Common utilities
+│   └── types/             # TypeScript type definitions
+├── convex/                # Backend functions
+│   ├── schema.ts          # Database schema (11 tables)
+│   ├── admin.ts           # Admin panel (17 exports)
+│   ├── organizations.ts   # Organization RBAC (7 exports)
+│   ├── billing.ts         # Polar.sh integration (5 exports)
+│   ├── subscriptions.ts   # Webhook handlers (7 exports)
+│   ├── users.ts           # User management (4 exports)
+│   ├── usageMetrics.ts    # Usage tracking (5 exports)
+│   ├── auditLogs.ts       # Compliance logging (3 exports)
+│   ├── chatMessages.ts    # AI chat persistence (5 exports)
+│   ├── contact.ts         # Contact forms (3 exports)
+│   ├── emails.ts          # Email notifications (4 exports)
+│   ├── health.ts          # Health checks (2 exports)
+│   └── http.ts            # HTTP endpoints & webhooks
+├── tests/                 # Test suites
+│   ├── unit/              # Vitest unit tests
+│   ├── e2e/               # Playwright E2E tests
+│   └── load/              # k6 load tests
+└── docs/                  # Documentation
 ```
 
 ---
 
-## Database Schema
+## 🗄️ Database Schema
 
-### Tables Overview
+### Convex Tables (11 total)
 
-| Table | Description | Key Indexes |
-|-------|-------------|-------------|
+| Table | Purpose | Key Indexes |
+|-------|---------|-------------|
 | `users` | User accounts with Clerk integration | by_token, by_organization, by_email, by_role |
 | `organizations` | Multi-tenant organizations | by_slug, by_owner |
-| `teamMembers` | Organization team members with roles | by_organization, by_user, by_organization_and_user |
-| `subscriptions` | Polar.sh subscription data | userId, polarId, organizationId |
-| `webhookEvents` | Polar.sh webhook event log | type, polarEventId |
-| `auditLogs` | Immutable audit trail | by_user, by_organization, by_action, by_timestamp, by_resource |
-| `usageMetrics` | Usage tracking for billing | by_organization, by_metric_type, by_period, by_organization_and_period |
-| `chatMessages` | AI chat message history | by_organization, by_user, by_conversation, by_timestamp |
-| `contactSubmissions` | Contact form submissions | by_email, by_status, by_submitted_at |
-| `featureFlags` | Feature flag management | by_name, by_organization, by_enabled |
-| `systemMetrics` | Aggregated analytics data | by_type, by_date, by_type_and_date |
+| `teamMembers` | Team roles (owner/admin/member) | by_organization_and_user |
+| `subscriptions` | Polar.sh subscription data | userId, polarId, organizationId, status |
+| `webhookEvents` | Polar webhook event log | type, polarEventId |
+| `auditLogs` | Immutable audit trail | by_user, by_organization, by_action, by_timestamp |
+| `usageMetrics` | Billing usage tracking | by_organization_and_period, by_metric_type |
+| `chatMessages` | AI chat history | by_organization, by_conversation |
+| `contactSubmissions` | Contact form data | by_email, by_status |
+| `featureFlags` | Feature toggles | by_name, by_organization |
+| `systemMetrics` | Aggregated analytics | by_type_and_date |
 
-### Detailed Schema
+---
 
-#### users
+## 🔐 Authentication & Authorization
+
+### Clerk Integration
+
+**Authentication Methods:**
+- Email/Password
+- OAuth (Google, GitHub, etc.)
+- Magic Links
+- Multi-factor authentication
+
+**User Roles:**
+- `super_admin` - Full system access
+- `admin` - Organization admin
+- `user` - Standard user
+
+### RBAC (Role-Based Access Control)
+
+**Organization Roles:**
+- `owner` - Full organization control
+- `admin` - Management capabilities
+- `member` - Standard access
+
+**Permission Checking:**
 ```typescript
-{
-  name?: string
-  email?: string
-  image?: string
-  tokenIdentifier: string              // Clerk user ID
-  role?: "super_admin" | "admin" | "user"
-  organizationId?: Id<"organizations">
-  isSuspended?: boolean
-  lastLoginAt?: number
-  createdAt?: number
-  updatedAt?: number
-  deletedAt?: number                   // Soft delete for compliance
-}
-```
+// Check user permission
+const permission = await ctx.runQuery(api.organizations.checkPermission, {
+  organizationId,
+  requiredRole: "admin" // or "owner", "member"
+});
 
-#### organizations
-```typescript
-{
-  name: string
-  slug: string                         // Unique org identifier
-  ownerId: string                      // User tokenIdentifier
-  plan?: string                        // "free", "pro", "enterprise"
-  subscriptionId?: Id<"subscriptions">
-  settings?: any                       // Org-specific settings
-  metadata?: any                       // Additional data
-  createdAt: number
-  updatedAt: number
-  deletedAt?: number
-}
-```
-
-#### teamMembers
-```typescript
-{
-  organizationId: Id<"organizations">
-  userId: string                       // User tokenIdentifier
-  role: "owner" | "admin" | "member"
-  invitedBy?: string
-  invitedAt?: number
-  joinedAt?: number
-  status: "pending" | "active" | "suspended"
-  createdAt: number
-  updatedAt: number
-}
-```
-
-#### subscriptions
-```typescript
-{
-  userId?: string
-  organizationId?: Id<"organizations">
-  polarId?: string                     // Polar.sh subscription ID
-  polarPriceId?: string
-  currency?: string
-  interval?: string                    // "month" | "year"
-  status?: string                      // "active", "canceled", "past_due"
-  currentPeriodStart?: number
-  currentPeriodEnd?: number
-  cancelAtPeriodEnd?: boolean
-  amount?: number
-  startedAt?: number
-  endsAt?: number
-  endedAt?: number
-  canceledAt?: number
-  customerCancellationReason?: string
-  customerCancellationComment?: string
-  metadata?: any
-  customFieldData?: any
-  customerId?: string
-}
-```
-
-#### auditLogs
-```typescript
-{
-  userId: string                       // Who performed the action
-  organizationId?: Id<"organizations">
-  action: string                       // e.g., "USER_CREATED", "SUBSCRIPTION_UPDATED"
-  resource: string                     // e.g., "user/123", "subscription/456"
-  resourceId?: string
-  status: "success" | "failure"
-  metadata?: any                       // Additional context
-  ipAddress?: string
-  userAgent?: string
-  timestamp: number
-}
-```
-
-#### usageMetrics
-```typescript
-{
-  organizationId: Id<"organizations">
-  userId: string
-  metricType: string                   // "ai_messages", "api_calls", "storage_mb"
-  quantity: number
-  metadata?: any
-  periodStart: number                  // Billing period start
-  periodEnd: number                    // Billing period end
-  timestamp: number
+if (!permission?.hasPermission) {
+  throw new Error("Unauthorized");
 }
 ```
 
 ---
 
-## Environment Variables
+## 💳 Subscription Billing (Polar.sh)
 
-### Required for Development
+### Integration Details
+
+**SDK Version**: `@polar-sh/sdk` latest
+**Server**: Production or Sandbox (configured via `POLAR_SERVER` env var)
+
+### Subscription Plans
+
+**Free Plan:**
+- 100 AI messages/month
+- 1,000 API calls/month
+- 100 MB storage
+- 3 team members max
+
+**Pro Plan ($29/month):**
+- 10,000 AI messages/month
+- 100,000 API calls/month
+- 10 GB storage
+- 25 team members max
+
+**Enterprise Plan (Custom):**
+- Unlimited usage
+- Unlimited team members
+- Custom features
+- Dedicated support
+
+### API Methods
+
+**Admin/Backend Operations (Access Token):**
+```typescript
+polar.subscriptions.revoke({ id: subscriptionId })  // Immediate cancellation
+polar.subscriptions.get({ id: subscriptionId })
+polar.subscriptions.list({ organizationId })
+polar.subscriptions.update({ id, data })
+```
+
+**Customer Portal Operations (Customer Session):**
+```typescript
+polar.customerPortal.subscriptions.cancel({ id: subscriptionId })  // Scheduled cancellation
+polar.customerPortal.subscriptions.get({ id: subscriptionId })
+polar.customerPortal.subscriptions.update({ id, data })
+```
+
+### Webhook Events
+
+**Endpoint**: `/webhook/polar`
+**Handler**: `convex/subscriptions.ts:587-640`
+
+**Supported Events:**
+- `subscription.created`
+- `subscription.updated`
+- `subscription.active`
+- `subscription.canceled`
+- `subscription.uncanceled`
+- `subscription.revoked`
+- `order.created`
+
+---
+
+## 🔧 Environment Variables
+
+### Production Configuration
 
 ```bash
-# Convex Backend
-CONVEX_DEPLOYMENT=dev:your-deployment-name
-VITE_CONVEX_URL=https://your-deployment.convex.cloud
-VITE_CONVEX_SITE_URL=http://localhost:5173
+# Convex Production Deployment
+CONVEX_DEPLOYMENT=prod:grateful-panther-627
+VITE_CONVEX_URL=https://grateful-panther-627.convex.cloud
+CONVEX_DEPLOY_KEY=prod:grateful-panther-627|<deploy-key>
+CONVEX_CLOUD_URL=https://grateful-panther-627.convex.cloud
+CONVEX_SITE_URL=https://grateful-panther-627.convex.site
 
 # Clerk Authentication
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxx
-CLERK_SECRET_KEY=sk_test_xxxxxxxxxxxxx
-
-# Frontend URL (for email links, redirects)
-FRONTEND_URL=http://localhost:5173
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_...
+CLERK_SECRET_KEY=sk_live_...
 
 # Polar.sh Payments
-POLAR_ACCESS_TOKEN=polar_xxxxxxxxxxxxx
-POLAR_ORGANIZATION_ID=org_xxxxxxxxxxxxx
-POLAR_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
-POLAR_SERVER=sandbox  # or "production"
+POLAR_ACCESS_TOKEN=polar_...
+POLAR_ORGANIZATION_ID=org_...
+POLAR_WEBHOOK_SECRET=whsec_...
+POLAR_SERVER=production  # or "sandbox"
 
 # Upstash Redis (Rate Limiting)
-UPSTASH_REDIS_REST_URL=https://xxxxx.upstash.io
-UPSTASH_REDIS_REST_TOKEN=xxxxxxxxxxxxx
+UPSTASH_REDIS_REST_URL=https://...upstash.io
+UPSTASH_REDIS_REST_TOKEN=...
 
 # OpenAI (AI Chat)
-OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+OPENAI_API_KEY=sk-...
 
-# Resend (Email Notifications)
-RESEND_API_KEY=re_xxxxxxxxxxxxx
+# Resend (Email)
+RESEND_API_KEY=re_...
 FROM_EMAIL=hello@techsci.io
 
-# Sentry (Error Tracking & Performance Monitoring)
-VITE_SENTRY_DSN=https://xxxxxxxxxxxxx@sentry.io/xxxxx
-SENTRY_AUTH_TOKEN=xxxxxxxxxxxxx
-VITE_GIT_COMMIT_SHA=auto  # Auto-populated on Vercel
+# Sentry (Error Tracking)
+VITE_SENTRY_DSN=https://...@sentry.io/...
+SENTRY_AUTH_TOKEN=...
+VITE_GIT_COMMIT_SHA=auto
+
+# Frontend
+FRONTEND_URL=https://taskcoda.com
 
 # Logging
-LOG_LEVEL=debug  # "debug", "info", "warn", "error"
-NODE_ENV=development  # "development", "production"
+LOG_LEVEL=info  # or "debug", "warn", "error"
+NODE_ENV=production
 ```
-
-### Required for Production
-
-All of the above variables, with these changes:
-- `CONVEX_DEPLOYMENT`: Use production deployment
-- `FRONTEND_URL`: Your production domain (e.g., https://taskcoda.com)
-- `POLAR_SERVER`: Set to `"production"`
-- `LOG_LEVEL`: Set to `"info"` or `"warn"`
-- `NODE_ENV`: Set to `"production"`
 
 ---
 
-## Development Commands
+## 🚀 Development Workflow
 
-### Initial Setup
+### Daily Development
+
 ```bash
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env.local
-
-# Configure environment variables (edit .env.local with your keys)
-```
-
-### Development
-```bash
-# Start Convex development server (Terminal 1)
+# Terminal 1: Start Convex dev server
 npx convex dev
 
-# Start React development server (Terminal 2)
+# Terminal 2: Start React dev server
 npm run dev
-# App available at http://localhost:5173
 ```
 
-### Building
+### Common Commands
+
 ```bash
 # Type checking
 npm run typecheck
@@ -372,330 +338,237 @@ npm run typecheck
 # Build for production
 npm run build
 
-# Start production server locally
-npm run start
-```
-
-### Testing
-```bash
-# Run unit tests
-npm run test:unit
-
-# Run unit tests with coverage
-npm run test:unit --coverage
-
-# Run tests in watch mode
-npm run test:watch
-
-# Open Vitest UI
-npm run test:ui
-
-# Run E2E tests
-npm run test:e2e
-
-# Open Playwright UI
-npm run test:e2e:ui
-
-# Run load tests
-npm run test:load
-
 # Run all tests
 npm run test:all
-```
 
-### Database Management
-```bash
+# Unit tests
+npm run test:unit
+
+# E2E tests
+npm run test:e2e
+
+# Load tests
+npm run test:load
+
 # Open Convex dashboard
 npx convex dashboard
-
-# Push schema changes
-npx convex deploy
-
-# Clear all data (development only!)
-npx convex run clearAllData
 ```
 
----
-
-## Common Development Tasks
-
-### Adding a New Route
-
-1. **Create route file** in `app/routes/`:
-```typescript
-// app/routes/my-new-page.tsx
-import { type Route } from "./+types/my-new-page";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "My New Page | Taskcoda" },
-    { name: "description", content: "Page description" }
-  ];
-}
-
-export default function MyNewPage() {
-  return <div>My New Page Content</div>;
-}
-```
-
-2. **Access route** at `/my-new-page`
-
-### Adding a Protected Route
-
-```typescript
-// app/routes/dashboard/my-protected-page.tsx
-import { useUser } from "@clerk/react-router";
-import { redirect } from "react-router";
-import { type Route } from "./+types/my-protected-page";
-
-export async function loader({ request }: Route.LoaderArgs) {
-  // Authentication is handled by Clerk
-  // Add additional checks here if needed
-  return {};
-}
-
-export default function MyProtectedPage() {
-  const { user, isLoaded } = useUser();
-
-  if (!isLoaded) return <div>Loading...</div>;
-  if (!user) return redirect("/sign-in");
-
-  return <div>Protected Content for {user.firstName}</div>;
-}
-```
-
-### Creating a Convex Query
-
-```typescript
-// convex/myQueries.ts
-import { v } from "convex/values";
-import { query } from "./_generated/server";
-
-export const getMyData = query({
-  args: {
-    id: v.id("tableName")
-  },
-  handler: async (ctx, args) => {
-    // Check authentication
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
-    // Query database
-    const data = await ctx.db.get(args.id);
-    return data;
-  }
-});
-```
-
-### Creating a Convex Mutation
-
-```typescript
-// convex/myMutations.ts
-import { v } from "convex/values";
-import { mutation } from "./_generated/server";
-
-export const createItem = mutation({
-  args: {
-    name: v.string(),
-    description: v.string()
-  },
-  handler: async (ctx, args) => {
-    // Check authentication
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
-    // Create item
-    const itemId = await ctx.db.insert("items", {
-      name: args.name,
-      description: args.description,
-      userId: identity.tokenIdentifier,
-      createdAt: Date.now()
-    });
-
-    // Create audit log
-    await ctx.db.insert("auditLogs", {
-      userId: identity.tokenIdentifier,
-      action: "ITEM_CREATED",
-      resource: `item/${itemId}`,
-      resourceId: itemId,
-      status: "success",
-      timestamp: Date.now()
-    });
-
-    return itemId;
-  }
-});
-```
-
-### Adding a shadcn/ui Component
+### Deploying to Production
 
 ```bash
-# List available components
-npx shadcn@latest add
-
-# Add specific component
-npx shadcn@latest add button
-npx shadcn@latest add dialog
-npx shadcn@latest add table
-
-# Component will be added to app/components/ui/
-```
-
-### Implementing RBAC Check
-
-```typescript
-// Check if user has required role
-import { useQuery } from "convex/react";
-import { api } from "~/convex/_generated/api";
-
-function MyComponent({ organizationId }) {
-  const permission = useQuery(api.organizations.checkPermission, {
-    organizationId,
-    requiredRole: "admin" // "owner", "admin", or "member"
-  });
-
-  if (!permission?.hasPermission) {
-    return <div>Access Denied</div>;
-  }
-
-  return <div>Admin Content</div>;
-}
-```
-
-### Recording Usage Metrics
-
-```typescript
-import { useMutation } from "convex/react";
-import { api } from "~/convex/_generated/api";
-
-function MyFeature() {
-  const recordUsage = useMutation(api.usageMetrics.recordUsage);
-
-  const handleAction = async () => {
-    // Perform action
-    // ...
-
-    // Record usage
-    await recordUsage({
-      organizationId: currentOrgId,
-      metricType: "ai_messages", // or "api_calls", "storage_mb", etc.
-      quantity: 1,
-      metadata: { feature: "my_feature" }
-    });
-  };
-
-  return <button onClick={handleAction}>Do Action</button>;
-}
-```
-
----
-
-## Deployment
-
-### Vercel Deployment (Recommended)
-
-1. **Connect Repository** to Vercel
-2. **Configure Environment Variables** in Vercel dashboard (all vars from .env.example)
-3. **Deploy**:
-   - Automatic on push to `main` branch
-   - Preview deployments for PRs
-
-4. **Convex Production Setup**:
-```bash
-# Deploy Convex to production
-npx convex deploy --prod
-
-# Get production URL and add to Vercel environment variables
-```
-
-5. **Polar.sh Webhook Setup**:
-   - URL: `https://yourdomain.com/webhook/polar`
-   - Secret: Add `POLAR_WEBHOOK_SECRET` to Vercel env vars
-
-### Manual Build
-
-```bash
-# Build
+# Build and deploy
 npm run build
+vercel deploy --prod
 
-# Output in build/ directory:
-# - build/client/ (static assets)
-# - build/server/ (server code)
-
-# Run production server
-npm run start
+# Deploy Convex functions
+npx convex deploy --prod
 ```
 
 ---
 
-## Important Notes
+## 🐛 Known Issues & Solutions
 
-### Security Considerations
-- All Convex mutations check `ctx.auth.getUserIdentity()` for authentication
-- RBAC enforced in `organizations.ts` through `checkPermission` query
-- Rate limiting applied per user and organization via Upstash Redis
-- Audit logs are immutable (no delete/update operations)
-- Sensitive data encrypted at rest by Convex
-- Environment variables never committed to git
-- Clerk handles all password security and session management
+### TypeScript Type Generation (61 errors)
 
-### Compliance Features
-- **SOC 2**: Audit logging, access controls, encryption at rest
-- **GDPR**: Data export, right to deletion (soft delete), consent tracking
-- **HIPAA**: Encryption, audit trails, access controls
+**Issue**: `convex/_generated/api.d.ts` is outdated and missing 8 modules
 
-### Performance Optimization
-- React Router SSR for fast initial page load
-- Convex real-time subscriptions for instant updates
-- Rate limiting prevents abuse
-- Sentry monitors performance metrics
-- CDN-served static assets via Vercel
+**Current Modules in Generated Types:**
+- ✅ http
+- ✅ subscriptions
+- ✅ users
 
-### Billing & Quotas
+**Missing Modules:**
+- ❌ admin (17 endpoints)
+- ❌ auditLogs
+- ❌ billing (5 endpoints)
+- ❌ chatMessages
+- ❌ contact
+- ❌ emails
+- ❌ health
+- ❌ organizations (7 endpoints including new `getTeamMemberRole`)
+- ❌ rateLimit
+- ❌ usageMetrics
 
-**Free Plan**:
-- 100 AI messages/month
-- 1,000 API calls/month
-- 100 MB storage
-- 3 team members max
+**Solution:**
+```bash
+npx convex dev
+```
 
-**Pro Plan** ($29/month):
-- 10,000 AI messages/month
-- 100,000 API calls/month
-- 10 GB storage
-- 25 team members max
-
-**Enterprise Plan** (Custom):
-- Unlimited usage
-- Unlimited team members
-- Custom features
-- Dedicated support
-
-### Monitoring & Logging
-- **Sentry**: Error tracking and performance monitoring
-- **Pino Logger**: Structured JSON logging with levels (debug, info, warn, error)
-- **Audit Logs**: All critical actions logged to database
-- **System Metrics**: Daily aggregated metrics for analytics
+This will:
+1. Connect to `prod:grateful-panther-627`
+2. Push all 11 Convex modules
+3. Regenerate `convex/_generated/api.d.ts` with all endpoints
+4. Reduce TypeScript errors from 80 → ~19
 
 ---
 
-## Support & Resources
+## 📊 Monitoring & Observability
+
+### Sentry Integration
+
+**Client-side**: `app/lib/sentry.client.ts`
+**Server-side**: `convex/lib/sentry.ts`
+
+**Features Enabled:**
+- Error tracking with source maps
+- Performance monitoring (10% sample rate in production)
+- Session replay (10% sessions, 100% on errors)
+- Custom breadcrumbs and context
+- User tracking with organization/plan tags
+
+**Configuration (SDK v10+):**
+```typescript
+Sentry.init({
+  dsn: process.env.VITE_SENTRY_DSN,
+  environment: process.env.MODE,
+  release: process.env.VITE_GIT_COMMIT_SHA,
+  tracesSampleRate: 0.1,
+  integrations: [
+    Sentry.browserTracingIntegration(),  // Auto-detects React Router v7
+    Sentry.replayIntegration({ /* ... */ }),
+  ],
+});
+```
+
+### Logging
+
+**Logger**: Pino (structured JSON logging)
+**Location**: `app/lib/logger.ts`
+
+**Log Levels:**
+- `debug` - Development details
+- `info` - General information
+- `warn` - Warnings and deprecations
+- `error` - Errors and exceptions
+
+### Analytics
+
+- **Vercel Analytics** - User behavior tracking
+- **Convex Metrics** - Real-time database metrics
+- **System Metrics Table** - Custom analytics aggregation
+
+---
+
+## 🔒 Security & Compliance
+
+### Security Features
+
+- ✅ Clerk authentication with MFA support
+- ✅ RBAC for organization access control
+- ✅ Rate limiting via Upstash Redis
+- ✅ Audit logging for compliance
+- ✅ Encrypted data at rest (Convex)
+- ✅ HTTPS everywhere
+- ✅ Environment variables never committed
+- ✅ Webhook signature validation
+
+### Compliance Support
+
+**SOC 2:**
+- Immutable audit logs
+- Access controls and RBAC
+- Encryption at rest and in transit
+
+**GDPR:**
+- Data export capabilities
+- Right to deletion (soft delete implemented)
+- Consent tracking
+- User data portability
+
+**HIPAA:**
+- Encryption requirements
+- Audit trails
+- Access controls
+- Session management
+
+---
+
+## 🧪 Testing Strategy
+
+### Unit Tests (Vitest)
+
+**Location**: `tests/unit/`
+**Coverage**: Component logic, utilities, helpers
+
+**Run Tests:**
+```bash
+npm run test:unit
+npm run test:ui  # Interactive UI
+```
+
+### E2E Tests (Playwright)
+
+**Location**: `tests/e2e/`
+**Coverage**: User flows, critical paths, cross-browser
+
+**Run Tests:**
+```bash
+npm run test:e2e
+npm run test:e2e:ui  # Interactive UI
+```
+
+### Load Tests (k6)
+
+**Location**: `tests/load/`
+**Coverage**: API performance, concurrent users, response times
+
+**Run Tests:**
+```bash
+npm run test:load
+```
+
+---
+
+## 📚 Additional Resources
 
 ### Documentation
-- React Router v7: https://reactrouter.com/
-- Convex: https://docs.convex.dev/
-- Clerk: https://clerk.com/docs
-- Polar.sh: https://docs.polar.sh/
-- shadcn/ui: https://ui.shadcn.com/
 
-### Contact
-- Email: hello@techsci.io
-- Company: TechSci, Inc.
+- [React Router v7](https://reactrouter.com/)
+- [Convex](https://docs.convex.dev/)
+- [Clerk](https://clerk.com/docs)
+- [Polar.sh](https://docs.polar.sh/)
+- [Sentry](https://docs.sentry.io/platforms/javascript/guides/react/)
+- [shadcn/ui](https://ui.shadcn.com/)
+
+### Internal Docs
+
+- `CHANGELOG.md` - Version history
+- `CODEBASE_REVIEW_REPORT.md` - Architecture analysis
+- `ENTERPRISE_FEATURES.md` - Enterprise capabilities
+- `docs/TESTING.md` - Testing guide
+- `docs/OBSERVABILITY.md` - Monitoring guide
 
 ---
 
-**Built with ❤️ by TechSci, Inc.**
+## 🎯 Roadmap
+
+### v2.2.0 (Planned)
+
+- [ ] Complete TypeScript strict mode compliance
+- [ ] Enhanced admin analytics dashboard
+- [ ] Real-time collaboration features
+- [ ] Advanced usage quota management
+- [ ] Multi-language support (i18n)
+
+### v3.0.0 (Future)
+
+- [ ] Advanced AI features
+- [ ] Custom integrations marketplace
+- [ ] White-label capabilities
+- [ ] Advanced reporting and exports
+- [ ] Mobile app (React Native)
+
+---
+
+## 🤝 Support
+
+**Email**: hello@techsci.io
+**GitHub**: [@code-craka](https://github.com/code-craka)
+**Company**: TechSci, Inc.
+
+---
+
+**Built with ❤️ for modern SaaS development**
+
+**Last Updated**: 2025-01-09 by Claude Code Assistant
