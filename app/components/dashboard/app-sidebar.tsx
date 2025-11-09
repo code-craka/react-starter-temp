@@ -1,9 +1,10 @@
 import { IconDashboard, IconSettings } from "@tabler/icons-react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Users, BarChart3 } from "lucide-react";
 import { Link } from "react-router";
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+import { OrganizationSwitcher } from "./organization-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +25,16 @@ const data = {
       title: "Chat",
       url: "/dashboard/chat",
       icon: MessageCircle,
+    },
+    {
+      title: "Team",
+      url: "/dashboard/team",
+      icon: Users,
+    },
+    {
+      title: "Usage",
+      url: "/dashboard/usage",
+      icon: BarChart3,
     },
   ],
   navSecondary: [
@@ -52,6 +63,9 @@ export function AppSidebar({
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="px-2 py-2">
+          <OrganizationSwitcher />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
