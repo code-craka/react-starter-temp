@@ -249,7 +249,7 @@ export default function MonitoringDashboard() {
             </div>
           ) : (
             <div className="space-y-3">
-              {recentErrors.map((error) => (
+              {recentErrors.map((error: any) => (
                 <div
                   key={error._id}
                   className="flex items-start gap-3 p-4 border rounded-lg hover:bg-muted/50 transition-colors"

@@ -1,6 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { ActionCtx, QueryCtx } from "./_generated/server";
+import type { ActionCtx, QueryCtx } from "./_generated/server";
 
 const http = httpRouter();
 
@@ -86,9 +86,10 @@ http.route({
 // Helper function to check database health
 async function checkDatabaseHealth(ctx: ActionCtx): Promise<boolean> {
   try {
-    // Try to query a small table
-    await ctx.runQuery(async (ctx: QueryCtx) => {
-      await ctx.db.query("users").take(1);
+    // Try to query the internal API to check database connection
+    await ctx.runQuery(async (queryCtx) => {
+      // Simple query to verify database is accessible
+      return await queryCtx.db.query("users").take(1);
     });
     return true;
   } catch (error) {

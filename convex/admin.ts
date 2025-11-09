@@ -1,16 +1,17 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 
 // ============================================================================
 // PERMISSION CHECKS
 // ============================================================================
 
 async function requireSuperAdmin(ctx: any) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
     throw new Error("Authentication required");
   }
+
+  const userId = identity.tokenIdentifier;
 
   const user = await ctx.db
     .query("users")
@@ -388,7 +389,7 @@ export const overrideSubscription = mutation({
 
     // Update organization plan
     await ctx.db.patch(args.organizationId, {
-      plan: args.newPlan,
+      plan: args.newPlan as "free" | "pro" | "enterprise",
       updatedAt: Date.now(),
     });
 

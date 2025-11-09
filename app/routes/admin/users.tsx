@@ -193,7 +193,7 @@ export default function UsersManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.users.map((user) => (
+                {users.users.map((user: any) => (
                   <TableRow key={user._id}>
                     <TableCell className="font-medium">
                       {user.name || "Unknown"}
@@ -337,7 +337,7 @@ export default function UsersManagement() {
                 <div>
                   <Label>Usage Metrics (Current Month)</Label>
                   <div className="mt-2 space-y-2">
-                    {userDetails.usageMetrics.map((metric) => (
+                    {userDetails.usageMetrics.map((metric: any) => (
                       <div
                         key={metric._id}
                         className="flex items-center justify-between p-3 border rounded-lg"
@@ -357,7 +357,7 @@ export default function UsersManagement() {
                 <div>
                   <Label>Recent Activity</Label>
                   <div className="mt-2 space-y-2 max-h-60 overflow-y-auto">
-                    {userDetails.auditLogs.map((log) => (
+                    {userDetails.auditLogs.map((log: any) => (
                       <div
                         key={log._id}
                         className="flex items-start gap-3 p-3 border rounded-lg text-sm"

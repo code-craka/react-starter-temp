@@ -45,7 +45,7 @@ export const createOrganization = mutation({
       name: args.name,
       slug: args.slug,
       ownerId: userId,
-      plan: args.plan || "free",
+      plan: (args.plan as "free" | "pro" | "enterprise" | undefined) || "free",
       createdAt: now,
       updatedAt: now,
     });

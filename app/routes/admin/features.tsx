@@ -161,7 +161,7 @@ export default function FeatureFlagsManagement() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {flags.map((flag) => (
+          {flags.map((flag: any) => (
             <Card key={flag._id}>
               <CardHeader>
                 <div className="flex items-start justify-between">

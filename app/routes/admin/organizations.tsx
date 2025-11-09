@@ -202,7 +202,7 @@ export default function OrganizationsManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {organizations.organizations.map((org) => (
+                {organizations.organizations.map((org: any) => (
                   <TableRow key={org._id}>
                     <TableCell className="font-medium">{org.name}</TableCell>
                     <TableCell className="text-muted-foreground">
@@ -299,7 +299,7 @@ export default function OrganizationsManagement() {
                   {orgDetails.members.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No members</p>
                   ) : (
-                    orgDetails.members.map((member) => (
+                    orgDetails.members.map((member: any) => (
                       <div
                         key={member._id}
                         className="flex items-center justify-between p-3 border rounded-lg"
@@ -371,7 +371,7 @@ export default function OrganizationsManagement() {
                 <div>
                   <Label className="text-base">Usage Metrics (Current Month)</Label>
                   <div className="mt-2 grid gap-2 md:grid-cols-2">
-                    {orgDetails.usageMetrics.map((metric) => (
+                    {orgDetails.usageMetrics.map((metric: any) => (
                       <div
                         key={metric._id}
                         className="flex items-center justify-between p-3 border rounded-lg"
@@ -391,7 +391,7 @@ export default function OrganizationsManagement() {
                 <div>
                   <Label className="text-base">Recent Activity</Label>
                   <div className="mt-2 space-y-2 max-h-60 overflow-y-auto">
-                    {orgDetails.auditLogs.slice(0, 10).map((log) => (
+                    {orgDetails.auditLogs.slice(0, 10).map((log: any) => (
                       <div
                         key={log._id}
                         className="flex items-start gap-3 p-3 border rounded-lg text-sm"

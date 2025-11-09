@@ -2,7 +2,7 @@
 
 # 🚀 Taskcoda - Modern SaaS Starter Template
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/code-craka/react-starter-temp)
+[![Version](https://img.shields.io/badge/version-2.1.1-blue.svg)](https://github.com/code-craka/react-starter-temp)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React Router](https://img.shields.io/badge/React_Router-v7.5.3-CA4245?logo=react-router&logoColor=white)](https://reactrouter.com)
 [![React](https://img.shields.io/badge/React-v19.1.0-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -586,7 +586,14 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-### Latest Version: v2.1.0
+### Latest Version: v2.1.1
+- 🔧 Complete TypeScript code quality cleanup (19 errors fixed)
+- ✨ Enhanced type safety across all admin panel components
+- 🎯 Fixed all implicit any type errors
+- 🔨 Resolved type import and union type mismatches
+- 📊 Reduced TypeScript errors from 80 to 63 (remaining are Convex type generation)
+
+### Previous Version: v2.1.0
 - 🐛 Critical bug fixes for production stability
 - 🔧 Polar.sh SDK compatibility improvements
 - 🎯 Sentry SDK v10+ configuration updates

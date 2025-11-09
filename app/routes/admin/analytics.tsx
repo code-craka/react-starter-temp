@@ -365,7 +365,7 @@ export default function AnalyticsDashboard() {
                   {Object.entries(featureUsage)
                     .sort(([, a], [, b]) => (b as number) - (a as number))
                     .map(([feature, count]) => {
-                      const maxUsage = Math.max(...Object.values(featureUsage));
+                      const maxUsage = Math.max(...Object.values(featureUsage).map(v => v as number));
                       const percentage = ((count as number) / maxUsage) * 100;
                       return (
                         <div key={feature} className="space-y-2">
