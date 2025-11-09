@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 
 export const findUserByToken = query({
@@ -22,6 +22,21 @@ export const findUserByToken = query({
     }
 
     return null;
+  },
+});
+
+/**
+ * Internal query to find user by token (used by HTTP endpoints)
+ */
+export const findUserByTokenInternal = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier))
+      .first();
+
+    return user;
   },
 });
 
