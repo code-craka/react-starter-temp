@@ -215,13 +215,13 @@ export const cancelOrganizationSubscription = action({
       throw new Error("No active subscription found");
     }
 
-    // Cancel via Polar API
+    // Revoke via Polar API (immediate cancellation)
     const polar = new Polar({
       server: (process.env.POLAR_SERVER as "sandbox" | "production") || "sandbox",
       accessToken: process.env.POLAR_ACCESS_TOKEN,
     });
 
-    await polar.subscriptions.cancel({
+    await polar.subscriptions.revoke({
       id: subscription.subscription.polarId,
     });
 
