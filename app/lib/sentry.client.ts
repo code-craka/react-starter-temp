@@ -30,10 +30,7 @@ export function initSentry() {
 
     // Performance Monitoring
     integrations: [
-      Sentry.browserTracingIntegration({
-        // Set up routing instrumentation
-        routingInstrumentation: Sentry.reactRouterV6Instrumentation,
-      }),
+      Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
         maskAllText: false,
         blockAllMedia: false,
